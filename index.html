@@ -10,165 +10,135 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
         :root {
-            --primary-blue: #1E90FF;
-            --secondary-blue: #4169E1;
-            --accent-gold: #FFD700;
-            --sky-blue: #87CEEB;
-            --divine-gold: #FFA500;
-            --shiva-blue: #4A90E2;
-            --text-white: #FFFFFF;
-            --font-primary: 'Orbitron', sans-serif;
-            --font-secondary: 'Rajdhani', sans-serif;
-            --font-sanskrit: 'Noto Sans Devanagari', sans-serif;
+            --primary-blue:#1E90FF; --secondary-blue:#4169E1;
+            --accent-gold:#FFD700; --sky-blue:#87CEEB;
+            --divine-gold:#FFA500; --text-white:#FFFFFF;
+            --font-primary:'Orbitron',sans-serif;
+            --font-secondary:'Rajdhani',sans-serif;
+            --font-sanskrit:'Noto Sans Devanagari',sans-serif;
         }
-
         body {
-            font-family: var(--font-secondary);
-            background: #000000;
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            color: var(--text-white);
+            font-family:var(--font-secondary);
+            background:#000; overflow:hidden;
+            width:100vw; height:100vh; color:#fff;
         }
 
-        #space3d {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1; pointer-events: none;
-        }
+        /* ── PERF FIX 1: Remove all animated CSS nebulas — replaced with static CSS only ── */
+        #space3d { position:fixed;inset:0;z-index:1;pointer-events:none; }
 
+        /* Static galaxy bg — NO animation, NO blur, GPU-composited via transform */
         .galaxy-background {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
+            position:fixed;inset:0;z-index:0;
             background:
-                radial-gradient(ellipse at 20% 30%, rgba(138,43,226,0.5), transparent 50%),
-                radial-gradient(ellipse at 80% 70%, rgba(30,144,255,0.5), transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(75,0,130,0.4), transparent 60%),
-                radial-gradient(ellipse at 60% 20%, rgba(255,215,0,0.3), transparent 40%),
-                radial-gradient(ellipse at 40% 80%, rgba(255,20,147,0.4), transparent 50%),
-                radial-gradient(ellipse at 90% 10%, rgba(0,191,255,0.4), transparent 45%),
-                linear-gradient(180deg, #000428 0%, #004e92 50%, #000428 100%);
-            z-index: 0;
-            animation: galaxyRotate 120s linear infinite;
+                radial-gradient(ellipse at 20% 30%,rgba(138,43,226,0.35) 0%,transparent 50%),
+                radial-gradient(ellipse at 80% 70%,rgba(30,144,255,0.35) 0%,transparent 50%),
+                radial-gradient(ellipse at 40% 80%,rgba(255,20,147,0.2) 0%,transparent 50%),
+                linear-gradient(180deg,#000428 0%,#001a4e 50%,#000428 100%);
+            /* Single slow rotation — one layer, no scale jank */
+            will-change:transform;
+            animation:galaxyRotate 120s linear infinite;
         }
+        @keyframes galaxyRotate {
+            0%   { transform:rotate(0deg)   scale(1.15); }
+            100% { transform:rotate(360deg) scale(1.15); }
+        }
+        /* REMOVED: .galaxy-layer-1/2 (two extra animated divs) */
+        /* REMOVED: .nebula-1 through .nebula-5 (blur:120px is extremely expensive) */
 
-        .galaxy-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.7; }
-        .galaxy-layer-1 { background: radial-gradient(ellipse at 30% 40%, rgba(138,43,226,0.2), transparent 60%); animation: parallaxMove 50s ease-in-out infinite; }
-        .galaxy-layer-2 { background: radial-gradient(ellipse at 70% 60%, rgba(30,144,255,0.2), transparent 60%); animation: parallaxMove 70s ease-in-out infinite reverse; }
+        #starsCanvas { position:fixed;inset:0;z-index:2;pointer-events:none; }
 
-        @keyframes galaxyRotate { 0%{transform:rotate(0deg) scale(1.2)} 100%{transform:rotate(360deg) scale(1.2)} }
-        @keyframes parallaxMove { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(8%,8%) scale(1.15)} }
-
-        .nebula-cloud { position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.5; pointer-events: none; z-index: 0; }
-        .nebula-1 { width:1200px;height:1000px;background:radial-gradient(circle,rgba(138,43,226,0.6),rgba(75,0,130,0.4),transparent);top:10%;left:15%;animation:nebulaFloat 35s ease-in-out infinite; }
-        .nebula-2 { width:1000px;height:1200px;background:radial-gradient(circle,rgba(30,144,255,0.6),rgba(0,191,255,0.4),transparent);bottom:20%;right:10%;animation:nebulaFloat 45s ease-in-out infinite reverse; }
-        .nebula-3 { width:800px;height:800px;background:radial-gradient(circle,rgba(255,215,0,0.5),rgba(255,165,0,0.3),transparent);top:50%;left:50%;transform:translate(-50%,-50%);animation:nebulaFloat 40s ease-in-out infinite; }
-        .nebula-4 { width:900px;height:700px;background:radial-gradient(circle,rgba(255,20,147,0.5),rgba(255,105,180,0.3),transparent);top:30%;right:30%;animation:nebulaFloat 50s ease-in-out infinite; }
-        .nebula-5 { width:700px;height:900px;background:radial-gradient(circle,rgba(0,255,127,0.4),rgba(50,205,50,0.3),transparent);bottom:30%;left:20%;animation:nebulaFloat 55s ease-in-out infinite reverse; }
-        @keyframes nebulaFloat { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(60px,-60px) scale(1.3)} }
-
-        #starsCanvas { position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none; }
-
+        /* START SCREEN */
         .start-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(ellipse at center, #001a33 0%, #000000 100%);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 1000; transition: opacity 0.8s ease;
+            position:fixed;inset:0;
+            background:radial-gradient(ellipse at center,#001a33,#000);
+            display:flex;flex-direction:column;justify-content:center;align-items:center;
+            z-index:1000;
         }
-        .start-screen.hidden { opacity: 0; pointer-events: none; }
-
         .mission-title {
-            font-family: var(--font-primary);
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
-            color: var(--accent-gold); margin-bottom: 20px; text-align: center;
-            letter-spacing: 6px; text-shadow: 0 0 30px rgba(255,215,0,0.8);
-            animation: titleGlow 3s ease-in-out infinite;
+            font-family:var(--font-primary);
+            font-size:clamp(1.5rem,4vw,2.5rem);
+            color:var(--accent-gold);margin-bottom:20px;text-align:center;
+            letter-spacing:6px;text-shadow:0 0 30px rgba(255,215,0,0.8);
+            animation:titleGlow 3s ease-in-out infinite;
         }
-        @keyframes titleGlow { 0%,100%{text-shadow:0 0 30px rgba(255,215,0,0.8)} 50%{text-shadow:0 0 50px rgba(255,215,0,1),0 0 80px rgba(255,215,0,0.6)} }
-
+        @keyframes titleGlow {
+            0%,100%{text-shadow:0 0 30px rgba(255,215,0,0.8);}
+            50%{text-shadow:0 0 50px rgba(255,215,0,1),0 0 80px rgba(255,215,0,0.5);}
+        }
         .start-button {
-            position: relative; padding: 28px 70px; font-size: 1.8rem; font-weight: 900;
-            font-family: var(--font-primary); color: var(--text-white);
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-            border: 3px solid var(--accent-gold); border-radius: 60px; cursor: pointer;
-            overflow: hidden; transition: all 0.3s ease;
-            box-shadow: 0 10px 40px rgba(30,144,255,0.6), 0 0 30px rgba(255,215,0,0.4), inset 0 0 20px rgba(255,255,255,0.1);
-            letter-spacing: 4px; text-transform: uppercase;
+            padding:28px 70px;font-size:1.8rem;font-weight:900;
+            font-family:var(--font-primary);color:#fff;
+            background:linear-gradient(135deg,#1E90FF,#4169E1);
+            border:3px solid #FFD700;border-radius:60px;cursor:pointer;
+            box-shadow:0 10px 40px rgba(30,144,255,0.6),0 0 30px rgba(255,215,0,0.4);
+            letter-spacing:4px;text-transform:uppercase;
+            transition:transform .3s,box-shadow .3s;
         }
-        .start-button:hover { transform: scale(1.08); box-shadow: 0 15px 60px rgba(30,144,255,0.8),0 0 50px rgba(255,215,0,0.6),inset 0 0 30px rgba(255,255,255,0.2); }
-        .button-text { position: relative; z-index: 2; }
-        .button-glow { position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,0.5);transform:translate(-50%,-50%);transition:width 0.6s ease,height 0.6s ease; }
-        .start-button:hover .button-glow { width:400px;height:400px; }
+        .start-button:hover {
+            transform:scale(1.08);
+            box-shadow:0 15px 60px rgba(30,144,255,0.8),0 0 50px rgba(255,215,0,0.6);
+        }
 
+        /* CINEMATIC */
         .cinematic-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent; z-index: 10; overflow: hidden; opacity: 0;
-            perspective: 2000px; transform-style: preserve-3d;
+            position:fixed;inset:0;z-index:10;overflow:hidden;opacity:0;
+            perspective:2000px;transform-style:preserve-3d;
         }
         .cinematic-container::after {
-            content:''; position:absolute; top:0; left:0; width:100%; height:100%;
-            background: radial-gradient(ellipse at center, transparent 0%, transparent 30%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.8) 100%);
-            pointer-events:none; z-index:100;
+            content:'';position:absolute;inset:0;
+            background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,0.7) 100%);
+            pointer-events:none;z-index:100;
         }
-
         .photo-slide {
-            position: absolute; top: 50%; left: 50%; width: 80%; height: 80%;
-            opacity: 0; transform-style: preserve-3d;
-            transform: translate(-50%,-50%) translateZ(0) rotateY(0deg);
-            will-change: transform, opacity;
+            position:absolute;top:50%;left:50%;width:80%;height:80%;
+            opacity:0;transform-style:preserve-3d;
+            transform:translate(-50%,-50%);will-change:transform,opacity;
         }
-        .photo-slide::before {
-            content:''; position:absolute; top:-15px;left:-15px;right:-15px;bottom:-15px;
-            background: linear-gradient(135deg,rgba(30,144,255,0.4),rgba(255,215,0,0.3));
-            border-radius:30px; filter:blur(25px); opacity:0; z-index:-1; transition:opacity 0.5s ease;
-        }
-        .photo-slide.active::before { opacity:1; }
+        /* PERF FIX 2: Removed blur glow pseudo-element on .photo-slide::before */
         .photo-slide img {
-            width:100%;height:100%;object-fit:cover;object-position:center;
-            filter:brightness(0.95) contrast(1.15) saturate(1.1);
-            border-radius:25px;
-            box-shadow: 0 60px 120px rgba(0,0,0,0.9), 0 0 60px rgba(30,144,255,0.4), inset 0 0 60px rgba(255,255,255,0.15);
-            will-change:transform; backface-visibility:hidden; position:relative;
+            width:100%;height:100%;object-fit:cover;border-radius:25px;
+            filter:brightness(0.95) contrast(1.1) saturate(1.1);
+            box-shadow:0 40px 100px rgba(0,0,0,0.9),0 0 40px rgba(30,144,255,0.3);
+            will-change:transform;backface-visibility:hidden;
         }
 
         .flash-overlay {
-            position:fixed;top:0;left:0;width:100%;height:100%;
-            background: radial-gradient(ellipse at center,rgba(255,255,255,1) 0%,rgba(255,255,255,0.8) 30%,rgba(255,255,255,0) 70%);
-            opacity:0; pointer-events:none; z-index:100; mix-blend-mode:screen; will-change:opacity;
+            position:fixed;inset:0;
+            background:radial-gradient(ellipse at center,rgba(255,255,255,0.95) 0%,transparent 70%);
+            opacity:0;pointer-events:none;z-index:100;mix-blend-mode:screen;will-change:opacity;
         }
 
+        /* FINAL MESSAGE */
         .final-message {
-            position:fixed;top:0;left:0;width:100%;height:100%;
+            position:fixed;inset:0;
             display:flex;justify-content:center;align-items:center;flex-direction:column;
-            background:radial-gradient(ellipse at center,rgba(0,4,40,0.8) 0%,rgba(0,0,0,0.95) 100%);
-            z-index:500; opacity:0; pointer-events:none;
+            background:radial-gradient(ellipse at center,rgba(0,4,40,0.85),rgba(0,0,0,0.96));
+            z-index:500;opacity:0;pointer-events:none;
         }
-        .final-message.visible { opacity:1; pointer-events:auto; }
-
+        .final-message.visible{opacity:1;pointer-events:auto;}
         .birthday-text {
-            font-family: var(--font-primary);
-            font-size: clamp(2.5rem,8vw,7rem); font-weight:900;
-            background: linear-gradient(135deg,var(--sky-blue),var(--primary-blue),var(--accent-gold),var(--divine-gold),var(--primary-blue));
-            background-size:400% 400%; background-clip:text; -webkit-background-clip:text;
-            -webkit-text-fill-color:transparent; text-align:center; padding:0 30px;
-            position:relative; z-index:2; letter-spacing:6px; line-height:1.3;
-            animation:gradient-shift 6s ease infinite; min-height:1.2em;
+            font-family:var(--font-primary);
+            font-size:clamp(2.5rem,8vw,7rem);font-weight:900;
+            background:linear-gradient(135deg,#87CEEB,#1E90FF,#FFD700,#FFA500,#1E90FF);
+            background-size:400% 400%;
+            background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            text-align:center;padding:0 30px;
+            letter-spacing:6px;line-height:1.3;
+            animation:gradShift 6s ease infinite;min-height:1.2em;
         }
-        .birthday-text .typed-text { display:inline-block; }
-        .birthday-text .cursor {
-            display:inline-block;width:4px;height:1em;background:var(--accent-gold);
-            margin-left:6px;animation:blink 1s infinite;vertical-align:baseline;box-shadow:0 0 10px var(--accent-gold);
+        .birthday-text .typed-text{display:inline-block;}
+        .birthday-text .cursor{
+            display:inline-block;width:4px;height:1em;background:#FFD700;
+            margin-left:6px;animation:blink 1s infinite;vertical-align:baseline;
         }
-        @keyframes gradient-shift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
-        @keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+        @keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+        @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
 
-        .shloka-container { margin-top:40px;text-align:center;max-width:90%;opacity:0; }
-        .shloka-text { font-family:var(--font-sanskrit);font-size:clamp(1.5rem,4vw,2.5rem);color:var(--accent-gold);line-height:1.8;margin-bottom:15px;text-shadow:0 0 20px rgba(255,215,0,0.6);letter-spacing:2px; }
-        .shloka-translation { font-family:var(--font-secondary);font-size:clamp(1rem,2.5vw,1.5rem);color:var(--sky-blue);line-height:1.6;font-style:italic;margin-top:10px;opacity:0.9; }
+        .shloka-container{margin-top:40px;text-align:center;max-width:90%;opacity:0;}
+        .shloka-text{font-family:var(--font-sanskrit);font-size:clamp(1.5rem,4vw,2.5rem);color:#FFD700;line-height:1.8;text-shadow:0 0 20px rgba(255,215,0,0.6);letter-spacing:2px;}
+        .shloka-translation{font-family:var(--font-secondary);font-size:clamp(1rem,2.5vw,1.5rem);color:#87CEEB;line-height:1.6;font-style:italic;margin-top:10px;}
 
         #shivaContainer {
             position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -176,217 +146,105 @@
             width:min(90vw,800px);height:min(90vh,1000px);
             display:flex;justify-content:center;align-items:center;
         }
-        .shiva-image-wrapper { position:relative;width:100%;height:100%;display:flex;justify-content:center;align-items:center; }
+        .shiva-image-wrapper{position:relative;width:100%;height:100%;display:flex;justify-content:center;align-items:center;}
+        /* PERF FIX 3: Shiva glow reduced from 3 drop-shadows to 1, animation slowed to 5s */
         .shiva-image {
             width:100%;height:100%;object-fit:contain;
-            filter:drop-shadow(0 0 80px rgba(255,215,0,0.8)) drop-shadow(0 0 120px rgba(255,165,0,0.6)) drop-shadow(0 0 160px rgba(30,144,255,0.4));
-            animation:shivaGlow 3s ease-in-out infinite;transform-origin:center;
-            image-rendering:high-quality;-webkit-backface-visibility:hidden;backface-visibility:hidden;
+            filter:drop-shadow(0 0 60px rgba(255,215,0,0.9));
+            animation:shivaGlow 5s ease-in-out infinite;
+            transform-origin:center;will-change:filter,transform;
         }
         @keyframes shivaGlow {
-            0%,100%{filter:drop-shadow(0 0 80px rgba(255,215,0,0.8)) drop-shadow(0 0 120px rgba(255,165,0,0.6)) drop-shadow(0 0 160px rgba(30,144,255,0.4));transform:scale(1)}
-            50%{filter:drop-shadow(0 0 100px rgba(255,215,0,1)) drop-shadow(0 0 150px rgba(255,165,0,0.8)) drop-shadow(0 0 200px rgba(30,144,255,0.6));transform:scale(1.02)}
+            0%,100%{filter:drop-shadow(0 0 60px rgba(255,215,0,0.9));transform:scale(1);}
+            50%{filter:drop-shadow(0 0 90px rgba(255,215,0,1));transform:scale(1.02);}
         }
         .shiva-aura {
-            position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120%;height:120%;
-            background:radial-gradient(circle,rgba(255,215,0,0.3) 0%,rgba(255,165,0,0.2) 30%,rgba(30,144,255,0.15) 60%,transparent 80%);
-            border-radius:50%;animation:auraPulse 4s ease-in-out infinite;pointer-events:none;
-        }
-        @keyframes auraPulse { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.6} 50%{transform:translate(-50%,-50%) scale(1.2);opacity:0.8} }
-
-        .motivational-quote { position:fixed;top:20%;left:50%;transform:translateX(-50%);z-index:450;text-align:center;opacity:0;pointer-events:none;max-width:90%;padding:0 20px; }
-        .quote-text { font-family:var(--font-primary);font-size:clamp(1.5rem,4vw,2.5rem);color:var(--accent-gold);text-shadow:0 0 20px rgba(255,215,0,0.8),0 0 40px rgba(255,165,0,0.6),0 0 60px rgba(30,144,255,0.4);line-height:1.6;letter-spacing:2px;margin-bottom:15px;font-weight:700; }
-        .quote-author { font-family:var(--font-secondary);font-size:clamp(1rem,2.5vw,1.5rem);color:var(--sky-blue);font-style:italic;opacity:0.9; }
-
-        .shiva-blessing { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:450;text-align:center;opacity:0;pointer-events:none; }
-        .shiva-message { font-family:var(--font-primary);font-size:clamp(2rem,5vw,4rem);color:var(--divine-gold);text-shadow:0 0 30px rgba(255,165,0,0.8),0 0 60px rgba(255,215,0,0.6);margin-bottom:20px;letter-spacing:4px; }
-        .shiva-subtitle { font-family:var(--font-secondary);font-size:clamp(1.2rem,3vw,2rem);color:var(--sky-blue);letter-spacing:3px; }
-
-        .birthday-message { margin-top:30px;font-family:var(--font-secondary);font-size:clamp(1rem,2.5vw,1.5rem);color:var(--text-white);line-height:1.8;max-width:800px;padding:0 20px;opacity:0; }
-
-        .glow-effect {
             position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-            width:800px;height:800px;
-            background:radial-gradient(circle,rgba(30,144,255,0.5),transparent 70%);
-            opacity:0.6;animation:pulse-glow 3s ease-in-out infinite;z-index:1;
+            width:120%;height:120%;
+            background:radial-gradient(circle,rgba(255,215,0,0.15) 0%,rgba(30,144,255,0.08) 60%,transparent 80%);
+            border-radius:50%;animation:auraPulse 6s ease-in-out infinite;
         }
-        @keyframes pulse-glow { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.6} 50%{transform:translate(-50%,-50%) scale(1.4);opacity:0.8} }
-
-        .confetti-canvas { position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;opacity:0; }
-        .confetti-canvas.visible { opacity:1; }
-
-        @media (max-width:768px) {
-            .start-button { padding:24px 50px;font-size:1.4rem; }
-            .birthday-text { font-size:clamp(2rem,10vw,4rem);padding:0 20px; }
-            .shloka-text { font-size:clamp(1.2rem,5vw,1.8rem); }
+        @keyframes auraPulse {
+            0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.5;}
+            50%{transform:translate(-50%,-50%) scale(1.1);opacity:0.7;}
         }
 
-        /* =============================================
-           NEW: POST-BIRTHDAY PHOTO GALLERY SEQUENCE
-           ============================================= */
+        .motivational-quote{position:fixed;top:20%;left:50%;transform:translateX(-50%);z-index:450;text-align:center;opacity:0;pointer-events:none;max-width:90%;padding:0 20px;}
+        .quote-text{font-family:var(--font-primary);font-size:clamp(1.2rem,3vw,2rem);color:#FFD700;line-height:1.6;letter-spacing:2px;margin-bottom:15px;font-weight:700;text-shadow:0 0 20px rgba(255,215,0,0.7);}
+        .quote-author{font-family:var(--font-secondary);font-size:clamp(1rem,2vw,1.4rem);color:#87CEEB;font-style:italic;}
 
-        /* Blackout screen */
-        #postBlackout {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 2000; opacity: 0; pointer-events: none;
+        .shiva-blessing{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:450;text-align:center;opacity:0;pointer-events:none;}
+        .shiva-message{font-family:var(--font-primary);font-size:clamp(2rem,5vw,4rem);color:#FFA500;margin-bottom:20px;letter-spacing:4px;text-shadow:0 0 30px rgba(255,165,0,0.8);}
+        .shiva-subtitle{font-family:var(--font-secondary);font-size:clamp(1.2rem,3vw,2rem);color:#87CEEB;letter-spacing:3px;}
+
+        .birthday-message{margin-top:30px;font-family:var(--font-secondary);font-size:clamp(1rem,2.5vw,1.5rem);color:#fff;line-height:1.8;max-width:800px;padding:0 20px;opacity:0;}
+
+        /* PERF FIX 4: glow-effect reduced from 800px to 500px, opacity lowered */
+        .glow-effect{
+            position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+            width:500px;height:500px;
+            background:radial-gradient(circle,rgba(30,144,255,0.35),transparent 70%);
+            opacity:0.4;animation:pulseGlow 5s ease-in-out infinite;z-index:1;
+        }
+        @keyframes pulseGlow{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.4;}50%{transform:translate(-50%,-50%) scale(1.25);opacity:0.6;}}
+
+        .confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:999;opacity:0;}
+        .confetti-canvas.visible{opacity:1;}
+
+        @media(max-width:768px){
+            .start-button{padding:24px 50px;font-size:1.4rem;}
+            .birthday-text{font-size:clamp(2rem,10vw,4rem);padding:0 20px;}
+            .shloka-text{font-size:clamp(1.2rem,5vw,1.8rem);}
         }
 
-        /* Galaxy canvas for post sequence */
-        #postGalaxyCanvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2001; opacity: 0; pointer-events: none;
+        /* POST-BIRTHDAY SEQUENCE */
+        #postBlackout{position:fixed;inset:0;background:#000;z-index:2000;opacity:0;pointer-events:none;}
+        #postGalaxyCanvas{position:fixed;inset:0;z-index:2001;opacity:0;pointer-events:none;}
+        #photoGallery{position:fixed;inset:0;z-index:2010;opacity:0;pointer-events:none;display:flex;justify-content:center;align-items:center;}
+        .gallery-photo{
+            position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+            opacity:0;border-radius:20px;overflow:hidden;background:#000;
+            box-shadow:0 0 50px rgba(30,144,255,0.5),0 30px 70px rgba(0,0,0,0.9);
         }
-
-        /* Photo gallery overlay */
-        #photoGallery {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2010; opacity: 0; pointer-events: none;
-            display: flex; justify-content: center; align-items: center;
+        .gallery-photo img{width:100%;height:100%;object-fit:contain;display:block;background:#000;}
+        .gallery-photo::before,.gallery-photo::after{
+            content:'';position:absolute;width:36px;height:36px;
+            border-color:rgba(255,215,0,0.8);border-style:solid;z-index:1;
         }
+        .gallery-photo::before{top:10px;left:10px;border-width:3px 0 0 3px;border-radius:4px 0 0 0;}
+        .gallery-photo::after{bottom:10px;right:10px;border-width:0 3px 3px 0;border-radius:0 0 4px 0;}
 
-        /* Individual gallery photo */
-        .gallery-photo {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0;
+        #photoCounter{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:2020;opacity:0;font-family:var(--font-primary);font-size:clamp(0.8rem,2vw,1rem);color:rgba(135,206,235,0.8);letter-spacing:4px;text-shadow:0 0 15px rgba(30,144,255,0.8);}
+        #photoCaption{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);z-index:2020;opacity:0;font-family:var(--font-primary);font-size:clamp(1rem,3vw,1.8rem);color:#FFD700;letter-spacing:3px;text-shadow:0 0 20px rgba(255,215,0,0.8);text-align:center;max-width:90%;white-space:nowrap;}
+        #photoDots{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:2020;display:flex;gap:10px;opacity:0;}
+        .photo-dot{width:8px;height:8px;border-radius:50%;background:rgba(135,206,235,0.3);border:1px solid rgba(135,206,235,0.6);transition:background .4s,box-shadow .4s,transform .4s;}
+        .photo-dot.active{background:#FFD700;border-color:#FFD700;box-shadow:0 0 10px #FFD700;transform:scale(1.4);}
 
-    border-radius: 20px;
-    overflow: hidden;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #000; /* prevents visual bleed */
-
-    box-shadow:
-        0 0 60px rgba(30,144,255,0.6),
-        0 0 120px rgba(255,215,0,0.3),
-        0 40px 80px rgba(0,0,0,0.9);
-}
-        .gallery-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;  /* 🔥 THIS IS THE IMPORTANT FIX */
-    object-position: center;
-
-    display: block;
-    background: #000;
-}
-
-        /* Photo counter */
-        #photoCounter {
-            position: fixed; bottom: 40px; left: 50%;
-            transform: translateX(-50%);
-            z-index: 2020; opacity: 0;
-            font-family: var(--font-primary);
-            font-size: clamp(0.8rem, 2vw, 1rem);
-            color: rgba(135,206,235,0.8);
-            letter-spacing: 4px;
-            text-shadow: 0 0 15px rgba(30,144,255,0.8);
+        #endCard{
+            position:fixed;inset:0;z-index:2030;opacity:0;pointer-events:none;
+            display:flex;flex-direction:column;justify-content:center;align-items:center;
+            background:radial-gradient(ellipse at center,rgba(0,4,40,0.9),rgba(0,0,0,0.98));
         }
-
-        /* Photo caption */
-        #photoCaption {
-            position: fixed; bottom: 80px; left: 50%;
-            transform: translateX(-50%);
-            z-index: 2020; opacity: 0;
-            font-family: var(--font-primary);
-            font-size: clamp(1rem, 3vw, 1.8rem);
-            color: var(--accent-gold);
-            letter-spacing: 3px;
-            text-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,165,0,0.5);
-            text-align: center;
-            max-width: 90%;
+        .end-title{
+            font-family:var(--font-primary);font-size:clamp(2rem,6vw,5rem);font-weight:900;
+            background:linear-gradient(135deg,#87CEEB,#FFD700,#FFA500,#1E90FF);
+            background-size:400% 400%;
+            background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            animation:gradShift 4s ease infinite;letter-spacing:4px;text-align:center;padding:0 20px;margin-bottom:20px;
         }
-
-        /* Progress dots */
-        #photoDots {
-            position: fixed; bottom: 20px; left: 50%;
-            transform: translateX(-50%);
-            z-index: 2020; display: flex; gap: 10px; opacity: 0;
-        }
-        .photo-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: rgba(135,206,235,0.3);
-            border: 1px solid rgba(135,206,235,0.6);
-            transition: all 0.4s ease;
-        }
-        .photo-dot.active {
-            background: var(--accent-gold);
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 12px var(--accent-gold);
-            transform: scale(1.4);
-        }
-
-        /* Decorative corner frames */
-        .gallery-photo::before, .gallery-photo::after {
-            content: '';
-            position: absolute;
-            width: 40px; height: 40px;
-            border-color: rgba(255,215,0,0.8);
-            border-style: solid;
-            z-index: 1;
-        }
-        .gallery-photo::before { top: 10px; left: 10px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
-        .gallery-photo::after  { bottom: 10px; right: 10px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
-
-        /* End card */
-        #endCard {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2030; opacity: 0; pointer-events: none;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: radial-gradient(ellipse at center, rgba(0,4,40,0.9) 0%, rgba(0,0,0,0.98) 100%);
-        }
-        .end-title {
-            font-family: var(--font-primary);
-            font-size: clamp(2rem, 6vw, 5rem);
-            font-weight: 900;
-            background: linear-gradient(135deg, #87CEEB, #FFD700, #FFA500, #1E90FF);
-            background-size: 400% 400%;
-            background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: gradient-shift 4s ease infinite;
-            letter-spacing: 4px; text-align: center; padding: 0 20px;
-            margin-bottom: 20px;
-        }
-        .end-subtitle {
-            font-family: var(--font-sanskrit);
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
-            color: var(--accent-gold);
-            text-shadow: 0 0 30px rgba(255,215,0,0.8);
-            letter-spacing: 3px; text-align: center;
-            margin-bottom: 15px;
-        }
-        .end-translation {
-            font-family: var(--font-secondary);
-            font-size: clamp(0.9rem, 2.5vw, 1.3rem);
-            color: var(--sky-blue);
-            font-style: italic; letter-spacing: 2px; text-align: center;
-        }
+        .end-subtitle{font-family:var(--font-sanskrit);font-size:clamp(1.5rem,4vw,2.5rem);color:#FFD700;text-shadow:0 0 30px rgba(255,215,0,0.8);letter-spacing:3px;text-align:center;margin-bottom:15px;}
+        .end-translation{font-family:var(--font-secondary);font-size:clamp(0.9rem,2.5vw,1.3rem);color:#87CEEB;font-style:italic;letter-spacing:2px;text-align:center;}
     </style>
 </head>
 <body>
-
-    <!-- ===== ORIGINAL HTML (UNTOUCHED) ===== -->
     <div id="space3d"></div>
     <div class="galaxy-background"></div>
-    <div class="galaxy-layer galaxy-layer-1"></div>
-    <div class="galaxy-layer galaxy-layer-2"></div>
-    <div class="nebula-cloud nebula-1"></div>
-    <div class="nebula-cloud nebula-2"></div>
-    <div class="nebula-cloud nebula-3"></div>
-    <div class="nebula-cloud nebula-4"></div>
-    <div class="nebula-cloud nebula-5"></div>
+    <!-- REMOVED: galaxy-layer-1, galaxy-layer-2, nebula-1 through nebula-5 -->
     <canvas id="starsCanvas"></canvas>
 
     <div id="startScreen" class="start-screen">
         <div class="mission-title">🚀 DIVINE SPACE JOURNEY 🚀</div>
-        <button id="startButton" class="start-button">
-            <span class="button-text">🕉️ BEGIN BLESSING 🕉️</span>
-            <span class="button-glow"></span>
-        </button>
+        <button id="startButton" class="start-button">🕉️ BEGIN BLESSING 🕉️</button>
     </div>
 
     <div id="cinematicContainer" class="cinematic-container"></div>
@@ -426,7 +284,6 @@
     <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
     <div id="flashOverlay" class="flash-overlay"></div>
 
-    <!-- Original audio -->
     <audio id="backgroundMusic" preload="auto" loop playsinline>
         <source src="music1.mp3" type="audio/mpeg">
     </audio>
@@ -434,977 +291,706 @@
         <source src="voice.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- ===== NEW HTML: Post-birthday sequence ===== -->
+    <!-- POST-BIRTHDAY SEQUENCE -->
     <div id="postBlackout"></div>
     <canvas id="postGalaxyCanvas"></canvas>
-
     <div id="photoGallery"></div>
-
     <div id="photoCaption"></div>
     <div id="photoCounter"></div>
     <div id="photoDots"></div>
-
     <div id="endCard">
-        <div class="end-title">✨ Always & Forever ✨</div>
+        <div class="end-title">✨ Always &amp; Forever ✨</div>
         <div class="end-subtitle">ॐ नमः शिवाय</div>
         <div class="end-translation">May Lord Shiva always walk beside you, dear brother 🕉️</div>
     </div>
-
-    <!-- New music for post sequence -->
     <audio id="postMusic" preload="auto" loop playsinline>
         <source src="music2.mp3" type="audio/mpeg">
     </audio>
 
-    <script>
-    // ================================================================
-    //  ORIGINAL CODE — 100% UNTOUCHED
-    // ================================================================
-    const CONFIG = {
-        photoTimings: [
-            { duration:3.5,zoom:1.2,moveX:30,moveY:0,rotate:2,rotateY:15,translateZ:200,flash:true,beatPunch:true },
-            { duration:3.2,zoom:1.15,moveX:-20,moveY:15,rotate:-1,rotateY:-10,translateZ:150,flash:false,beatPunch:false },
-            { duration:3.8,zoom:1.25,moveX:15,moveY:-20,rotate:1.5,rotateY:20,translateZ:250,flash:true,beatPunch:true },
-            { duration:3.0,zoom:1.18,moveX:-25,moveY:10,rotate:-2,rotateY:-15,translateZ:180,flash:false,beatPunch:false },
-            { duration:3.5,zoom:1.22,moveX:20,moveY:-15,rotate:1,rotateY:12,translateZ:220,flash:true,beatPunch:true },
-            { duration:3.3,zoom:1.17,moveX:-15,moveY:20,rotate:-1.5,rotateY:-18,translateZ:190,flash:false,beatPunch:false },
-        ],
-        fadeInDuration: 0.8,
-        fadeOutDuration: 0.6,
-        flashDuration: 0.2,
-        beatPunchScale: 1.05,
-        beatPunchDuration: 0.15,
-        containerFadeInDuration: 1.5,
-    };
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════
+//  PERFORMANCE BUDGET
+// ═══════════════════════════════════════════════════════
+const isMobile    = window.innerWidth < 768;
+const STAR_COUNT  = isMobile ? 300  : 500;   // was 800
+const PLANET_SEG  = isMobile ? 24   : 32;    // was 64
+const THREE_STARS = isMobile ? 2000 : 3500;  // was 8000
+const CONFETTI_N  = isMobile ? 100  : 180;   // was 400
+const POST_STARS  = isMobile ? 400  : 700;   // was 1200
+const PIX_RATIO   = Math.min(window.devicePixelRatio, 1.5); // cap DPR
 
-    const SHLOKAS = [
-        { text:"ॐ नमः शिवाय", translation:"Om Namah Shivaya - Salutations to Lord Shiva" },
-        { text:"सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः", translation:"May all be happy, may all be free from illness" },
-        { text:"आयुष्मान् भव सौभाग्यं ते भवतु सदा", translation:"May you be long-lived and always fortunate" }
-    ];
+// ═══════════════════════════════════════════════════════
+//  CONFIG (original, untouched)
+// ═══════════════════════════════════════════════════════
+const CONFIG = {
+    photoTimings: [
+        { duration:3.5, zoom:1.2,  moveX:30,  moveY:0,   rotate:2,   rotateY:15,  translateZ:200, flash:true,  beatPunch:true  },
+        { duration:3.2, zoom:1.15, moveX:-20, moveY:15,  rotate:-1,  rotateY:-10, translateZ:150, flash:false, beatPunch:false },
+        { duration:3.8, zoom:1.25, moveX:15,  moveY:-20, rotate:1.5, rotateY:20,  translateZ:250, flash:true,  beatPunch:true  },
+        { duration:3.0, zoom:1.18, moveX:-25, moveY:10,  rotate:-2,  rotateY:-15, translateZ:180, flash:false, beatPunch:false },
+        { duration:3.5, zoom:1.22, moveX:20,  moveY:-15, rotate:1,   rotateY:12,  translateZ:220, flash:true,  beatPunch:true  },
+        { duration:3.3, zoom:1.17, moveX:-15, moveY:20,  rotate:-1.5,rotateY:-18, translateZ:190, flash:false, beatPunch:false },
+    ],
+    fadeInDuration: 0.8, fadeOutDuration: 0.6, flashDuration: 0.2,
+    beatPunchScale: 1.05, beatPunchDuration: 0.15, containerFadeInDuration: 1.5,
+};
 
-    const BIRTHDAY_MESSAGES = [
-        "On this special day, may Lord Shiva's divine blessings shower upon you.",
-        "May you be blessed with wisdom, prosperity, and eternal happiness.",
-        "As you journey through life, may the divine light guide your path.",
-        "May every moment of your life be filled with joy and success.",
-        "ॐ शान्ति शान्ति शान्ति - Om Shanti Shanti Shanti (Peace, Peace, Peace)"
-    ];
-
-    let scene, camera, renderer;
-    let shivaScene, shivaCamera, shivaRenderer;
-    let planets = [];
-    let spaceParticles = [];
-    let shivaGroup = null;
-    let animationFrameId;
-    let shivaAnimationId;
-
-    function init3DSpace() {
-        const container = document.getElementById('space3d');
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-        camera.position.z = 2000;
-        renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        container.appendChild(renderer.domElement);
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
-        scene.add(ambientLight);
-        const light1 = new THREE.DirectionalLight(0x87CEEB, 0.8);
-        light1.position.set(1000, 1000, 1000);
-        scene.add(light1);
-        const light2 = new THREE.DirectionalLight(0xFFD700, 0.6);
-        light2.position.set(-1000, -1000, -1000);
-        scene.add(light2);
-        createStarField();
-        createPlanet('earth',  0x4A90E2, 150, { x:-800,  y:-400, z:-1500 });
-        createPlanet('saturn', 0xFAD5A5, 200, { x:1000,  y:300,  z:-2000 });
-        createPlanet('mars',   0xCD5C5C, 120, { x:-600,  y:600,  z:-1800 });
-        createPlanet('moon',   0xC0C0C0,  80, { x:800,   y:-500, z:-1200 });
-        createPlanet('jupiter',0xD2691E, 180, { x:-1200, y:200,  z:-2200 });
-        createPlanet('venus',  0xFFD700, 100, { x:1200,  y:-300, z:-1800 });
-        createPlanet('neptune',0x4169E1, 140, { x:600,   y:800,  z:-2500 });
-        createPlanet('uranus', 0x4B0082, 130, { x:-1000, y:-600, z:-2000 });
-        createSpaceParticles();
-        animate3DSpace();
-    }
-
-    function createStarField() {
-        const starsGeometry = new THREE.BufferGeometry();
-        const starsMaterial = new THREE.PointsMaterial({ color:0xFFFFFF, size:2.5, transparent:true, opacity:0.9 });
-        const starsVertices = [];
-        for (let i = 0; i < 8000; i++) {
-            starsVertices.push((Math.random()-0.5)*6000, (Math.random()-0.5)*6000, (Math.random()-0.5)*6000);
-        }
-        starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
-        scene.add(new THREE.Points(starsGeometry, starsMaterial));
-    }
-
-    function createPlanet(name, color, size, position) {
-        const geometry = new THREE.SphereGeometry(size, 64, 64);
-        const material = new THREE.MeshPhongMaterial({ color, emissive:color, emissiveIntensity:0.3, shininess:50, specular:0xFFFFFF });
-        const planet = new THREE.Mesh(geometry, material);
-        planet.position.set(position.x, position.y, position.z);
-        planet.userData = { name, rotationSpeed: Math.random()*0.01+0.005 };
-        const glowGeo = new THREE.SphereGeometry(size*1.15, 32, 32);
-        const glowMat = new THREE.MeshBasicMaterial({ color, transparent:true, opacity:0.4 });
-        planet.add(new THREE.Mesh(glowGeo, glowMat));
-        if (name === 'saturn') {
-            const ringGeo = new THREE.RingGeometry(size*1.2, size*1.9, 128);
-            const ringMat = new THREE.MeshBasicMaterial({ color:0xDAA520, side:THREE.DoubleSide, transparent:true, opacity:0.7 });
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.rotation.x = Math.PI/2;
-            planet.add(ring);
-        }
-        scene.add(planet);
-        planets.push(planet);
-    }
-
-    function createSpaceParticles() {
-        const geo = new THREE.BufferGeometry();
-        const mat = new THREE.PointsMaterial({ color:0x87CEEB, size:4, transparent:true, opacity:0.7, blending:THREE.AdditiveBlending });
-        const verts = [];
-        for (let i = 0; i < 300; i++) {
-            verts.push((Math.random()-0.5)*4000, (Math.random()-0.5)*4000, (Math.random()-0.5)*4000);
-        }
-        geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-        const particles = new THREE.Points(geo, mat);
-        scene.add(particles);
-        spaceParticles.push(particles);
-    }
-
-    function animate3DSpace() {
-        animationFrameId = requestAnimationFrame(animate3DSpace);
-        planets.forEach(p => { p.rotation.y += p.userData.rotationSpeed; });
-        camera.position.z -= 2.5;
-        if (camera.position.z < -5000) camera.position.z = 2000;
-        spaceParticles.forEach(p => { p.rotation.y += 0.0015; });
-        renderer.render(scene, camera);
-    }
-
-    const MOTIVATIONAL_QUOTES = [
-        { text:"The only way to do great work is to love what you do.", author:"— Steve Jobs" },
-        { text:"Believe you can and you're halfway there.", author:"— Theodore Roosevelt" },
-        { text:"Success is not final, failure is not fatal: it is the courage to continue that counts.", author:"— Winston Churchill" },
-        { text:"The future belongs to those who believe in the beauty of their dreams.", author:"— Eleanor Roosevelt" },
-        { text:"You are never too old to set another goal or to dream a new dream.", author:"— C.S. Lewis" },
-        { text:"May Lord Shiva's divine energy guide you to achieve greatness.", author:"— Divine Blessing" }
-    ];
-
-    let currentQuoteIndex = 0;
-
-    function showMotivationalQuote() {
-        const quoteContainer = document.getElementById('motivationalQuote');
-        const quoteText = document.getElementById('quoteText');
-        const quoteAuthor = document.getElementById('quoteAuthor');
-        const quote = MOTIVATIONAL_QUOTES[currentQuoteIndex % MOTIVATIONAL_QUOTES.length];
-        quoteText.textContent = '';
-        quoteAuthor.textContent = '';
-        gsap.to(quoteContainer, { opacity:1, y:0, duration:1, ease:'power2.out' });
-        let charIndex = 0;
-        function typeQuote() {
-            if (charIndex < quote.text.length) {
-                quoteText.textContent = quote.text.substring(0, charIndex+1);
-                charIndex++;
-                setTimeout(typeQuote, 50);
-            } else {
-                setTimeout(() => {
-                    gsap.to(quoteAuthor, { opacity:1, duration:0.8, ease:'power2.out' });
-                    quoteAuthor.textContent = quote.author;
-                }, 300);
-            }
-        }
-        typeQuote();
-        setTimeout(() => {
-            gsap.to(quoteContainer, {
-                opacity:0, y:-20, duration:0.8, ease:'power2.in',
-                onComplete: () => {
-                    currentQuoteIndex++;
-                    if (currentQuoteIndex < MOTIVATIONAL_QUOTES.length * 2) setTimeout(showMotivationalQuote, 500);
-                }
-            });
-        }, 5000);
-    }
-
-    function initShiva3D() {}
-
-    function showShiva() {
-        const shivaContainer = document.getElementById('shivaContainer');
-        const shivaImage = document.getElementById('shivaImage');
-        const shivaBlessing = document.getElementById('shivaBlessing');
-        const imagePaths = ['natraja.jpg'];
-        const img = new Image();
-        let currentPathIndex = 0;
-        img.onload = () => { shivaImage.src = img.src; startShivaAnimation(); };
-        img.onerror = () => {
-            currentPathIndex++;
-            if (currentPathIndex < imagePaths.length) img.src = imagePaths[currentPathIndex];
-            else { console.warn('Shiva image not found'); startShivaAnimation(); }
-        };
-        img.src = imagePaths[0];
-
-        function startShivaAnimation() {
-            gsap.set(shivaContainer, { opacity:0, scale:0.3, rotation:15, y:'100vh' });
-            const tl = gsap.timeline({
-                onComplete: () => { setTimeout(() => showMotivationalQuote(), 2000); }
-            });
-            tl.to(shivaContainer, { opacity:1, duration:1, ease:'power2.out' })
-              .to(shivaContainer, { scale:1, rotation:0, y:0, duration:3, ease:'power2.out' }, '<')
-              .to(shivaContainer, { y:-20, duration:2, ease:'sine.inOut', repeat:-1, yoyo:true }, '+=0.5')
-              .to(shivaImage, { rotation:2, duration:4, ease:'sine.inOut', repeat:-1, yoyo:true, transformOrigin:'center center' }, '<');
-            setTimeout(() => { gsap.to(shivaBlessing, { opacity:1, scale:1, duration:1.5, ease:'back.out(1.2)' }); }, 2000);
-            setTimeout(() => { createFlashEffect(); }, 3000);
-            setTimeout(() => { createShivaParticleExplosion(); }, 2500);
-        }
-    }
-
-    function createShivaParticleExplosion() {
-        const shivaContainer = document.getElementById('shivaContainer');
-        const rect = shivaContainer.getBoundingClientRect();
-        const centerX = rect.left + rect.width/2;
-        const centerY = rect.top + rect.height/2;
-        for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-                const particle = document.createElement('div');
-                particle.style.cssText = `position:fixed;width:6px;height:6px;border-radius:50%;
-                    background:${['#FFD700','#FFA500','#87CEEB','#FFFFFF'][Math.floor(Math.random()*4)]};
-                    left:${centerX}px;top:${centerY}px;pointer-events:none;z-index:410;box-shadow:0 0 10px currentColor;`;
-                document.body.appendChild(particle);
-                const angle = (Math.PI*2*i)/50;
-                const distance = Math.random()*300+200;
-                gsap.to(particle, { x:Math.cos(angle)*distance, y:Math.sin(angle)*distance, opacity:0, scale:0, duration:2, ease:'power2.out', onComplete:()=>particle.remove() });
-            }, i*30);
-        }
-    }
-
-    const starsCanvas = document.getElementById('starsCanvas');
-    const starsCtx = starsCanvas.getContext('2d');
-    let stars = [];
-    let starsAnimationId;
-    let warpSpeed = 1;
-
-    function initStars() {
-        starsCanvas.width = window.innerWidth;
-        starsCanvas.height = window.innerHeight;
-        stars = [];
-        for (let i = 0; i < 800; i++) {
-            stars.push({
-                x: Math.random()*starsCanvas.width - starsCanvas.width/2,
-                y: Math.random()*starsCanvas.height - starsCanvas.height/2,
-                z: Math.random()*4000,
-                size: Math.random()*4+0.5,
-                opacity: Math.random()*0.95+0.05,
-                speed: Math.random()*3+1
-            });
-        }
-    }
-
-    function animateStars() {
-        starsCtx.fillStyle = 'rgba(0,0,0,0.03)';
-        starsCtx.fillRect(0, 0, starsCanvas.width, starsCanvas.height);
-        const centerX = starsCanvas.width/2;
-        const centerY = starsCanvas.height/2;
-        stars.forEach(star => {
-            star.z -= warpSpeed * star.speed;
-            if (star.z <= 0) {
-                star.z = 4000;
-                star.x = Math.random()*starsCanvas.width - starsCanvas.width/2;
-                star.y = Math.random()*starsCanvas.height - starsCanvas.height/2;
-            }
-            const perspective = 1000;
-            const scale = perspective/(perspective+star.z);
-            const x2d = centerX + star.x*scale;
-            const y2d = centerY + star.y*scale;
-            const size = star.size*scale*2.5;
-            const trailLength = warpSpeed*star.speed*6;
-            const trailX = centerX + star.x*(perspective/(perspective+star.z+trailLength));
-            const trailY = centerY + star.y*(perspective/(perspective+star.z+trailLength));
-            const gradient = starsCtx.createLinearGradient(trailX, trailY, x2d, y2d);
-            gradient.addColorStop(0, 'rgba(135,206,235,0)');
-            gradient.addColorStop(0.5, `rgba(135,206,235,${star.opacity*scale*0.6})`);
-            gradient.addColorStop(1, `rgba(255,255,255,${star.opacity*scale})`);
-            starsCtx.strokeStyle = gradient;
-            starsCtx.lineWidth = size*2;
-            starsCtx.lineCap = 'round';
-            starsCtx.beginPath();
-            starsCtx.moveTo(trailX, trailY);
-            starsCtx.lineTo(x2d, y2d);
-            starsCtx.stroke();
-            starsCtx.fillStyle = `rgba(255,255,255,${star.opacity*scale})`;
-            starsCtx.beginPath();
-            starsCtx.arc(x2d, y2d, size, 0, Math.PI*2);
-            starsCtx.fill();
-        });
-        starsAnimationId = requestAnimationFrame(animateStars);
-    }
-
-    function increaseWarpSpeed() {
-        gsap.to({value:warpSpeed}, { value:10, duration:0.5, ease:'power2.out',
-            onUpdate: function() { warpSpeed = this.targets()[0].value; }
-        });
-        setTimeout(() => {
-            gsap.to({value:warpSpeed}, { value:1, duration:1, ease:'power2.in',
-                onUpdate: function() { warpSpeed = this.targets()[0].value; }
-            });
-        }, 500);
-    }
-
-    const samplePhotos = [];
-    const colors = [
-        ['#1E90FF','#87CEEB'],['#4169E1','#ADD8E6'],['#00BFFF','#E0F6FF'],
-        ['#4682B4','#B0E0E6'],['#5F9EA0','#AFEEEE'],['#6495ED','#F0F8FF']
-    ];
-
-    function createSampleImage(index) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 1920; canvas.height = 1080;
-        const ctx = canvas.getContext('2d');
-        const gradient = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
-        gradient.addColorStop(0, colors[index][0]);
-        gradient.addColorStop(1, colors[index][1]);
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = 'rgba(255,255,255,0.2)';
-        for (let i = 0; i < 50; i++) {
-            ctx.beginPath();
-            ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*100+50, 0, Math.PI*2);
-            ctx.fill();
-        }
-        ctx.fillStyle = 'rgba(255,255,255,0.95)';
-        ctx.font = 'bold 120px Rajdhani';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        const phrases = ['✈️ DREAM BIG','🛫 FLY HIGH','☁️ TOUCH THE SKY','🌟 REACH FOR STARS','🛬 WINGS OF HOPE','⭐ PILOT IN MAKING'];
-        ctx.fillText(phrases[index], canvas.width/2, canvas.height/2);
-        ctx.font = '50px Rajdhani';
-        ctx.fillStyle = 'rgba(255,215,0,0.9)';
-        ctx.fillText(`Flight Path ${index+1}`, canvas.width/2, canvas.height/2+100);
-        return canvas.toDataURL();
-    }
-    for (let i = 0; i < 6; i++) samplePhotos.push(createSampleImage(i));
-
-    const startScreen = document.getElementById('startScreen');
-    const startButton = document.getElementById('startButton');
-    const cinematicContainer = document.getElementById('cinematicContainer');
-    const finalMessage = document.getElementById('finalMessage');
-    const flashOverlay = document.getElementById('flashOverlay');
-    const confettiCanvas = document.getElementById('confettiCanvas');
-    const backgroundMusic = document.getElementById('backgroundMusic');
-    const introVoice = document.getElementById('introVoice');
-    const birthdayText = document.querySelector('.birthday-text .typed-text');
-    const shlokaContainer = document.getElementById('shlokaContainer');
-    const birthdayMessage = document.getElementById('birthdayMessage');
-
-    let currentPhotoIndex = 0;
-    let sequenceStarted = false;
-
-    function createPhotoSlides() {
-        samplePhotos.forEach((dataUrl, index) => {
-            const slide = document.createElement('div');
-            slide.className = 'photo-slide';
-            slide.id = `photo-${index}`;
-            const img = document.createElement('img');
-            img.src = dataUrl;
-            img.alt = `Memory ${index+1}`;
-            slide.appendChild(img);
-            cinematicContainer.appendChild(slide);
-        });
-    }
-
-    function fadeInMusic(audio, duration=3) {
-        audio.volume = 0;
-        audio.play().catch(()=>{});
-        gsap.to(audio, { volume:0.7, duration, ease:"power2.out" });
-    }
-
-    startButton.addEventListener('click', () => {
-        if (sequenceStarted) return;
-        sequenceStarted = true;
-        gsap.to(startButton, { scale:0.9, duration:0.1, onComplete:()=>gsap.to(startButton,{scale:1,duration:0.2}) });
-        init3DSpace();
-        initStars();
-        animateStars();
-        if (introVoice) { introVoice.volume=1; introVoice.play().catch(()=>{}); }
-        if (backgroundMusic) { backgroundMusic.currentTime=0; fadeInMusic(backgroundMusic,4); }
-        gsap.to(startScreen, { opacity:0, duration:1, ease:'power2.inOut', onComplete:()=>{ startScreen.style.display='none'; } });
-        gsap.to(cinematicContainer, {
-            opacity:1, duration:CONFIG.containerFadeInDuration, ease:'power2.inOut', delay:0.5,
-            onComplete: ()=>{ setTimeout(()=>startCinematicSequence(),300); }
-        });
-    });
-
-    function startCinematicSequence() { animatePhoto(0); }
-
-    function animatePhoto(index) {
-        if (index >= samplePhotos.length) {
-            showShiva();
-            setTimeout(()=>showFinalMessage(), 5000);
-            return;
-        }
-        const slide = document.getElementById(`photo-${index}`);
-        const img = slide.querySelector('img');
-        const timing = CONFIG.photoTimings[index] || CONFIG.photoTimings[0];
-        increaseWarpSpeed();
-        if (timing.flash) { createFlashEffect(); createCameraShake(); }
-        if (timing.beatPunch) createBeatPunch();
-        const tl = gsap.timeline({ onComplete:()=>animatePhoto(index+1) });
-        slide.classList.add('active');
-        gsap.set(slide, { opacity:0, zIndex:10+index, rotateY:timing.rotateY*2, rotateX:10, scale:0.3, z:-2000 });
-        gsap.set(img, { scale:1, x:0, y:0, rotation:0 });
-        tl.to(slide, { opacity:1, rotateY:timing.rotateY, rotateX:0, scale:1, z:timing.translateZ, duration:CONFIG.fadeInDuration, ease:'power3.out' })
-          .to(slide, { rotateY:timing.rotateY*0.5, rotateX:timing.rotate*0.3, z:timing.translateZ*1.2, duration:timing.duration*0.5, ease:'power1.inOut' }, '<0.2')
-          .to(img, { scale:timing.zoom, x:timing.moveX, y:timing.moveY, rotation:timing.rotate, duration:timing.duration, ease:'power1.inOut' }, '<')
-          .to(slide, { opacity:0, rotateY:-timing.rotateY*2, rotateX:-15, scale:1.5, z:2000, duration:CONFIG.fadeOutDuration, ease:'power2.in', onComplete:()=>slide.classList.remove('active') }, `-=${CONFIG.fadeOutDuration}`);
-    }
-
-    function createFlashEffect() {
-        gsap.timeline()
-            .to(flashOverlay, { opacity:0.9, duration:CONFIG.flashDuration, ease:'power3.out' })
-            .to(flashOverlay, { opacity:0, duration:CONFIG.flashDuration*1.5, ease:'power3.in' });
-    }
-
-    function createBeatPunch() {
-        gsap.timeline()
-            .to(cinematicContainer, { scale:CONFIG.beatPunchScale, duration:CONFIG.beatPunchDuration, ease:'power2.out' })
-            .to(cinematicContainer, { scale:1, duration:CONFIG.beatPunchDuration*2, ease:'elastic.out(1,0.3)' });
-    }
-
-    function createCameraShake() {
-        gsap.timeline()
-            .to(cinematicContainer, { x:5, duration:0.05, ease:'power1.inOut' })
-            .to(cinematicContainer, { x:-5, duration:0.05, ease:'power1.inOut' })
-            .to(cinematicContainer, { x:4, duration:0.05, ease:'power1.inOut' })
-            .to(cinematicContainer, { x:-4, duration:0.05, ease:'power1.inOut' })
-            .to(cinematicContainer, { x:0, duration:0.05, ease:'power1.inOut' });
-    }
-
-    function showFinalMessage() {
-        gsap.to(finalMessage, { opacity:1, duration:2, ease:'power2.inOut' });
-        finalMessage.classList.add('visible');
-        const fullText = "Happy Birthday Brother Mere Bhai Shivam Bharti✈️";
-        let charIndex = 0;
-        function typeChar() {
-            if (charIndex < fullText.length) {
-                birthdayText.textContent = fullText.substring(0, charIndex+1);
-                charIndex++;
-                setTimeout(typeChar, 100);
-            } else {
-                setTimeout(()=>{ document.querySelector('.birthday-text .cursor').style.display='none'; showShlokas(); }, 500);
-            }
-        }
-        setTimeout(typeChar, 1000);
-        gsap.to('.birthday-text', { textShadow:'0 0 150px rgba(30,144,255,1), 0 0 80px rgba(255,215,0,0.8)', duration:1.8, repeat:-1, yoyo:true, ease:'sine.inOut', delay:2 });
-        gsap.fromTo(finalMessage, { scale:0.8 }, { scale:1, duration:3, ease:'power2.out' });
-        setTimeout(()=>{ confettiCanvas.classList.add('visible'); startConfetti(); }, 3000);
-
-        // ── NEW: after 20 seconds, trigger the post-birthday galaxy photo sequence
-        setTimeout(() => startPostBirthdaySequence(), 20000);
-    }
-
-    function showShlokas() {
-        setTimeout(()=>{
-            const shloka1 = document.getElementById('shloka1');
-            const shloka1Trans = document.getElementById('shloka1Trans');
-            typewriterEffect(SHLOKAS[0].text, shloka1, 150, ()=>{
-                gsap.to(shloka1Trans, { opacity:1, duration:1, ease:'power2.out' });
-                shloka1Trans.textContent = SHLOKAS[0].translation;
-            });
-            gsap.to(shlokaContainer, { opacity:1, duration:1, ease:'power2.out' });
-        }, 500);
-        setTimeout(()=>{
-            const shloka2 = document.getElementById('shloka2');
-            const shloka2Trans = document.getElementById('shloka2Trans');
-            typewriterEffect(SHLOKAS[1].text, shloka2, 120, ()=>{
-                gsap.to(shloka2Trans, { opacity:1, duration:1, ease:'power2.out' });
-                shloka2Trans.textContent = SHLOKAS[1].translation;
-            });
-        }, 4000);
-        setTimeout(()=>{
-            let messageIndex = 0;
-            function showNextMessage() {
-                if (messageIndex < BIRTHDAY_MESSAGES.length) {
-                    birthdayMessage.textContent = BIRTHDAY_MESSAGES[messageIndex];
-                    gsap.to(birthdayMessage, { opacity:1, duration:1, ease:'power2.out', onComplete:()=>{
-                        setTimeout(()=>{ gsap.to(birthdayMessage, { opacity:0, duration:0.5, onComplete:()=>{ messageIndex++; showNextMessage(); } }); }, 3000);
-                    }});
-                }
-            }
-            showNextMessage();
-        }, 8000);
-    }
-
-    function typewriterEffect(text, element, speed, onComplete) {
-        let index = 0;
-        element.style.opacity = '1';
-        function type() {
-            if (index < text.length) { element.textContent = text.substring(0, index+1); index++; setTimeout(type, speed); }
-            else { if (onComplete) onComplete(); }
-        }
-        type();
-    }
-
-    function startConfetti() {
-        const canvas = confettiCanvas;
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const confettiPieces = [];
-        const confettiColors = ['#1E90FF','#4169E1','#87CEEB','#FFD700','#FFA500','#FFFFFF','#FF4500'];
-        for (let i = 0; i < 400; i++) {
-            confettiPieces.push({
-                x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height,
-                width: Math.random()*15+8, height: Math.random()*15+8,
-                color: confettiColors[Math.floor(Math.random()*confettiColors.length)],
-                speedY: Math.random()*5+3, speedX: Math.random()*4-2,
-                rotation: Math.random()*360, rotationSpeed: Math.random()*15-7.5,
-                opacity: Math.random()*0.6+0.4
-            });
-        }
-        function animateConfetti() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            confettiPieces.forEach(p => {
-                p.y += p.speedY; p.x += p.speedX; p.rotation += p.rotationSpeed; p.speedY += 0.06;
-                if (p.y > canvas.height+20) { p.y=-20; p.x=Math.random()*canvas.width; p.speedY=Math.random()*5+3; }
-                ctx.save(); ctx.globalAlpha=p.opacity; ctx.translate(p.x,p.y); ctx.rotate(p.rotation*Math.PI/180);
-                ctx.fillStyle=p.color; ctx.fillRect(-p.width/2,-p.height/2,p.width,p.height); ctx.restore();
-            });
-            requestAnimationFrame(animateConfetti);
-        }
-        animateConfetti();
-    }
-
-    window.addEventListener('resize', () => {
-        if (starsCanvas) { starsCanvas.width=window.innerWidth; starsCanvas.height=window.innerHeight; }
-        if (confettiCanvas.classList.contains('visible')) { confettiCanvas.width=window.innerWidth; confettiCanvas.height=window.innerHeight; }
-        if (renderer && camera) { camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth,window.innerHeight); }
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-        createPhotoSlides();
-        gsap.to(startButton, { scale:1.05, duration:1.2, repeat:-1, yoyo:true, ease:'sine.inOut' });
-    });
-
-
-    // ================================================================
-    //  NEW EXTENSION — POST-BIRTHDAY GALAXY PHOTO SEQUENCE
-    //  Nothing above this line is modified.
-    // ================================================================
-
-    // ── CONFIG: Replace these src values with your actual image paths ──
-    const GALLERY_PHOTOS = [
-  { src: 'images/photo1.jpeg', caption: '🌟 A Star Is Born' },
-  { src: 'images/photo2.jpeg', caption: '✈️ Born to Fly' },
-  { src: 'images/photo3.jpeg', caption: '💫 Chasing Dreams' },
-  { src: 'images/photo4.jpeg', caption: '🚀 Sky Is Not The Limit' },
-  { src: 'images/photo5.jpeg', caption: '🎯 Always Focused' },
-  { src: 'images/photo6.jpeg', caption: '🔥 Pure Fire' },
-  { src: 'images/photo7.jpeg', caption: '🌙 Moonwalker' },
-  { src: 'images/photo8.jpeg', caption: '🏆 Born Champion' },
-  { src: 'images/photo9.jpeg', caption: '🎂 Blessed Soul' },
-  { src: 'images/photo10.jpeg', caption: '❤️ Mere Bhai' },
+const SHLOKAS = [
+    { text:'ॐ नमः शिवाय', translation:'Om Namah Shivaya - Salutations to Lord Shiva' },
+    { text:'सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः', translation:'May all be happy, may all be free from illness' },
+    { text:'आयुष्मान् भव सौभाग्यं ते भवतु सदा', translation:'May you be long-lived and always fortunate' }
 ];
 
-    // Post-sequence state
-    let postGalaxyStars = [];
-    let postGalaxyAnimId = null;
-    let postGalaxyCanvas = null;
-    let postGalaxyCtx = null;
-    let currentGalleryIndex = 0;
-    let galleryRunning = false;
+const BIRTHDAY_MESSAGES = [
+    'On this special day, may Lord Shiva\'s divine blessings shower upon you.',
+    'May you be blessed with wisdom, prosperity, and eternal happiness.',
+    'As you journey through life, may the divine light guide your path.',
+    'May every moment of your life be filled with joy and success.',
+    'ॐ शान्ति शान्ति शान्ति - Om Shanti Shanti Shanti (Peace, Peace, Peace)'
+];
 
-    // ── STEP 1: BLACKOUT ──────────────────────────────────────────────
-    function startPostBirthdaySequence() {
-        const blackout = document.getElementById('postBlackout');
+// ═══════════════════════════════════════════════════════
+//  THREE.JS — optimised
+// ═══════════════════════════════════════════════════════
+let scene, camera, renderer, planets=[], spaceParticles=[], animationFrameId;
+let _3dPaused = false;
 
-        // Fade to black over 2 seconds
-        gsap.to(blackout, {
-            opacity: 1,
-            duration: 2,
-            ease: 'power2.inOut',
-            pointerEvents: 'auto',
-            onComplete: () => {
-                // Fade out original music
-                gsap.to(backgroundMusic, {
-                    volume: 0, duration: 1.5,
-                    onComplete: () => { try { backgroundMusic.pause(); } catch(e){} }
-                });
+function init3DSpace() {
+    const container = document.getElementById('space3d');
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 8000);
+    camera.position.z = 2000;
 
-                // Start new music
-                startPostMusic();
+    // PERF: antialias OFF, capped pixel ratio
+    renderer = new THREE.WebGLRenderer({ alpha:true, antialias:false });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(PIX_RATIO);
+    container.appendChild(renderer.domElement);
 
-                // After brief hold in black, launch galaxy + photos
-                setTimeout(() => initPostGalaxy(), 1000);
-            }
-        });
-    }
+    scene.add(new THREE.AmbientLight(0x555555, 1));
+    const sun = new THREE.DirectionalLight(0xAADDFF, 1);
+    sun.position.set(1000, 1000, 1000);
+    scene.add(sun);
 
-    // ── STEP 2: NEW MUSIC ─────────────────────────────────────────────
-    function startPostMusic() {
-        const postMusic = document.getElementById('postMusic');
-        postMusic.volume = 0;
-        postMusic.currentTime = 0;
-        postMusic.play().catch(() => {
-            // music2.mp3 not found — silent fallback
-        });
-        gsap.to(postMusic, { volume: 0.75, duration: 3, ease: 'power2.out' });
-    }
+    // Star field
+    const geo = new THREE.BufferGeometry();
+    const verts = new Float32Array(THREE_STARS * 3);
+    for (let i=0; i<THREE_STARS*3; i++) verts[i] = (Math.random()-0.5)*6000;
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+    scene.add(new THREE.Points(geo, new THREE.PointsMaterial({color:0xFFFFFF,size:2,transparent:true,opacity:0.85})));
 
-    // ── STEP 3: GALAXY STAR BACKGROUND ───────────────────────────────
-    function initPostGalaxy() {
-        postGalaxyCanvas = document.getElementById('postGalaxyCanvas');
-        postGalaxyCtx = postGalaxyCanvas.getContext('2d');
-        postGalaxyCanvas.width = window.innerWidth;
-        postGalaxyCanvas.height = window.innerHeight;
+    // PERF: fewer planets, lower segments, no glow meshes
+    createPlanet(0x4A90E2, 120, -800, -400, -1500);
+    createPlanet(0xFAD5A5, 160,  1000,  300, -2000, true);
+    createPlanet(0xCD5C5C,  90, -600,  600, -1800);
+    createPlanet(0xD2691E, 150, -1200,  200, -2200);
+    createPlanet(0x4169E1, 110,   600,  800, -2500);
 
-        // Generate dense star field with colours
-        postGalaxyStars = [];
-        const starColors = [
-            'rgba(255,255,255,', 'rgba(135,206,235,', 'rgba(255,215,0,',
-            'rgba(180,130,255,', 'rgba(100,200,255,', 'rgba(255,180,100,'
-        ];
-        for (let i = 0; i < 1200; i++) {
-            postGalaxyStars.push({
-                x: Math.random() * postGalaxyCanvas.width,
-                y: Math.random() * postGalaxyCanvas.height,
-                r: Math.random() * 2.5 + 0.2,
-                opacity: Math.random() * 0.8 + 0.2,
-                twinkleSpeed: Math.random() * 0.03 + 0.005,
-                twinklePhase: Math.random() * Math.PI * 2,
-                color: starColors[Math.floor(Math.random() * starColors.length)],
-            });
-        }
+    // Small particle cloud
+    const pgeo = new THREE.BufferGeometry();
+    const pv = new Float32Array(150*3);
+    for (let i=0; i<450; i++) pv[i]=(Math.random()-0.5)*4000;
+    pgeo.setAttribute('position', new THREE.Float32BufferAttribute(pv,3));
+    const pc = new THREE.Points(pgeo, new THREE.PointsMaterial({color:0x87CEEB,size:3,transparent:true,opacity:0.5,blending:THREE.AdditiveBlending}));
+    scene.add(pc);
+    spaceParticles.push(pc);
 
-        // Fade in the galaxy canvas
-        gsap.to(postGalaxyCanvas, { opacity: 1, duration: 2.5, ease: 'power2.out' });
+    animate3DSpace();
+}
 
-        // Fade out the blackout so galaxy shows
-        gsap.to(document.getElementById('postBlackout'), {
-            opacity: 0, duration: 2.5, ease: 'power2.out',
-            onComplete: () => {
-                document.getElementById('postBlackout').style.pointerEvents = 'none';
-            }
-        });
-
-        // Start galaxy animation loop
-        animatePostGalaxy();
-
-        // Prepare and show photos after galaxy fades in
-        setTimeout(() => {
-            buildGalleryDots();
-            showGalleryPhoto(0);
-        }, 2500);
-    }
-
-    function animatePostGalaxy() {
-        postGalaxyCtx.clearRect(0, 0, postGalaxyCanvas.width, postGalaxyCanvas.height);
-
-        // Deep space gradient background
-        const bg = postGalaxyCtx.createRadialGradient(
-            postGalaxyCanvas.width/2, postGalaxyCanvas.height/2, 0,
-            postGalaxyCanvas.width/2, postGalaxyCanvas.height/2, postGalaxyCanvas.width * 0.8
+function createPlanet(color, size, x, y, z, hasRing=false) {
+    const mat = new THREE.MeshPhongMaterial({color, emissive:color, emissiveIntensity:0.2, shininess:25});
+    const planet = new THREE.Mesh(new THREE.SphereGeometry(size, PLANET_SEG, PLANET_SEG), mat);
+    planet.position.set(x, y, z);
+    planet.userData.rs = Math.random()*0.007+0.003;
+    if (hasRing) {
+        const ring = new THREE.Mesh(
+            new THREE.RingGeometry(size*1.2, size*1.8, 48),
+            new THREE.MeshBasicMaterial({color:0xDAA520, side:THREE.DoubleSide, transparent:true, opacity:0.6})
         );
-        bg.addColorStop(0,   'rgba(10, 0, 40, 1)');
-        bg.addColorStop(0.3, 'rgba(5, 0, 25, 1)');
-        bg.addColorStop(0.7, 'rgba(2, 0, 15, 1)');
-        bg.addColorStop(1,   'rgba(0, 0, 5, 1)');
-        postGalaxyCtx.fillStyle = bg;
-        postGalaxyCtx.fillRect(0, 0, postGalaxyCanvas.width, postGalaxyCanvas.height);
-
-        // Nebula glow blobs
-        const nebulaPositions = [
-            { x: 0.2, y: 0.3, r: 0.35, color: 'rgba(80,0,180,' },
-            { x: 0.8, y: 0.7, r: 0.30, color: 'rgba(0,60,180,' },
-            { x: 0.5, y: 0.5, r: 0.25, color: 'rgba(120,0,80,' },
-            { x: 0.7, y: 0.2, r: 0.20, color: 'rgba(0,100,120,' },
-        ];
-        nebulaPositions.forEach(n => {
-            const ng = postGalaxyCtx.createRadialGradient(
-                n.x * postGalaxyCanvas.width, n.y * postGalaxyCanvas.height, 0,
-                n.x * postGalaxyCanvas.width, n.y * postGalaxyCanvas.height, n.r * postGalaxyCanvas.width
-            );
-            ng.addColorStop(0,   n.color + '0.12)');
-            ng.addColorStop(0.5, n.color + '0.06)');
-            ng.addColorStop(1,   n.color + '0)');
-            postGalaxyCtx.fillStyle = ng;
-            postGalaxyCtx.fillRect(0, 0, postGalaxyCanvas.width, postGalaxyCanvas.height);
-        });
-
-        // Milky Way band
-        const mwGrad = postGalaxyCtx.createLinearGradient(0, postGalaxyCanvas.height*0.3, postGalaxyCanvas.width, postGalaxyCanvas.height*0.7);
-        mwGrad.addColorStop(0,   'rgba(100,80,180,0)');
-        mwGrad.addColorStop(0.3, 'rgba(120,100,200,0.07)');
-        mwGrad.addColorStop(0.5, 'rgba(150,120,255,0.12)');
-        mwGrad.addColorStop(0.7, 'rgba(120,100,200,0.07)');
-        mwGrad.addColorStop(1,   'rgba(100,80,180,0)');
-        postGalaxyCtx.fillStyle = mwGrad;
-        postGalaxyCtx.fillRect(0, 0, postGalaxyCanvas.width, postGalaxyCanvas.height);
-
-        // Twinkling stars
-        const now = Date.now() * 0.001;
-        postGalaxyStars.forEach(star => {
-            const twinkle = 0.5 + 0.5 * Math.sin(now * star.twinkleSpeed * 60 + star.twinklePhase);
-            const alpha = star.opacity * (0.4 + 0.6 * twinkle);
-            postGalaxyCtx.beginPath();
-            postGalaxyCtx.arc(star.x, star.y, star.r, 0, Math.PI*2);
-            postGalaxyCtx.fillStyle = star.color + alpha + ')';
-            postGalaxyCtx.fill();
-
-            // Bright stars get a cross-sparkle
-            if (star.r > 1.8 && alpha > 0.7) {
-                postGalaxyCtx.strokeStyle = star.color + (alpha * 0.4) + ')';
-                postGalaxyCtx.lineWidth = 0.5;
-                postGalaxyCtx.beginPath();
-                postGalaxyCtx.moveTo(star.x - star.r*3, star.y);
-                postGalaxyCtx.lineTo(star.x + star.r*3, star.y);
-                postGalaxyCtx.moveTo(star.x, star.y - star.r*3);
-                postGalaxyCtx.lineTo(star.x, star.y + star.r*3);
-                postGalaxyCtx.stroke();
-            }
-        });
-
-        postGalaxyAnimId = requestAnimationFrame(animatePostGalaxy);
+        ring.rotation.x = Math.PI/2;
+        planet.add(ring);
     }
+    scene.add(planet);
+    planets.push(planet);
+}
 
-    // ── STEP 4: BUILD DOTS ────────────────────────────────────────────
-    function buildGalleryDots() {
-        const dotsEl = document.getElementById('photoDots');
-        dotsEl.innerHTML = '';
-        GALLERY_PHOTOS.forEach((_, i) => {
-            const dot = document.createElement('div');
-            dot.className = 'photo-dot';
-            dot.id = `dot-${i}`;
-            dotsEl.appendChild(dot);
-        });
-        gsap.to(dotsEl, { opacity: 1, duration: 1 });
-    }
+function animate3DSpace() {
+    animationFrameId = requestAnimationFrame(animate3DSpace);
+    if (_3dPaused) return;
+    planets.forEach(p => { p.rotation.y += p.userData.rs; });
+    camera.position.z -= 2.5;
+    if (camera.position.z < -5000) camera.position.z = 2000;
+    spaceParticles.forEach(p => { p.rotation.y += 0.001; });
+    renderer.render(scene, camera);
+}
 
-    function updateDot(index) {
-        document.querySelectorAll('.photo-dot').forEach((d, i) => {
-            d.classList.toggle('active', i === index);
+// ═══════════════════════════════════════════════════════
+//  2D STARS CANVAS — optimised
+// ═══════════════════════════════════════════════════════
+const starsCanvas = document.getElementById('starsCanvas');
+const starsCtx = starsCanvas.getContext('2d');
+let stars=[], warpSpeed=1;
+
+function initStars() {
+    starsCanvas.width  = innerWidth;
+    starsCanvas.height = innerHeight;
+    stars = [];
+    for (let i=0; i<STAR_COUNT; i++) {
+        stars.push({
+            x: (Math.random()-0.5)*innerWidth*2,
+            y: (Math.random()-0.5)*innerHeight*2,
+            z: Math.random()*4000,
+            size: Math.random()*3+0.5,
+            op: Math.random()*0.85+0.15,
+            spd: Math.random()*2+0.8
         });
     }
+}
 
-    // ── STEP 5: GALLERY PHOTO SHOW ────────────────────────────────────
-    function showGalleryPhoto(index) {
-        if (index >= GALLERY_PHOTOS.length) {
-            // All photos shown — show end card
-            setTimeout(() => showEndCard(), 1500);
-            return;
+function animateStars() {
+    // PERF FIX 5: higher alpha = shorter trail = less overdraw per frame
+    starsCtx.fillStyle = 'rgba(0,0,0,0.12)';
+    starsCtx.fillRect(0, 0, starsCanvas.width, starsCanvas.height);
+    const cx = starsCanvas.width/2, cy = starsCanvas.height/2;
+    const P = 1000;
+
+    stars.forEach(s => {
+        s.z -= warpSpeed * s.spd;
+        if (s.z <= 0) { s.z=4000; s.x=(Math.random()-0.5)*innerWidth*2; s.y=(Math.random()-0.5)*innerHeight*2; }
+        const sc = P/(P+s.z);
+        const x = cx+s.x*sc, y = cy+s.y*sc, sz = Math.max(0.4, s.size*sc*2);
+
+        // PERF FIX 6: trail only when warping, and NO createLinearGradient per star
+        if (warpSpeed > 2) {
+            const sc2 = P/(P+s.z+warpSpeed*s.spd*5);
+            starsCtx.strokeStyle = `rgba(135,206,235,${s.op*sc*0.45})`;
+            starsCtx.lineWidth = sz;
+            starsCtx.beginPath();
+            starsCtx.moveTo(cx+s.x*sc2, cy+s.y*sc2);
+            starsCtx.lineTo(x, y);
+            starsCtx.stroke();
         }
 
-        galleryRunning = true;
-        currentGalleryIndex = index;
-        const photo = GALLERY_PHOTOS[index];
-        const gallery = document.getElementById('photoGallery');
+        starsCtx.fillStyle = `rgba(255,255,255,${s.op*sc})`;
+        starsCtx.beginPath();
+        starsCtx.arc(x, y, sz/2, 0, Math.PI*2);
+        starsCtx.fill();
+    });
 
-        // Show the gallery container
-        gsap.to(gallery, { opacity: 1, duration: 0.5 });
+    requestAnimationFrame(animateStars);
+}
 
-        // Update counter
-        const counter = document.getElementById('photoCounter');
-        counter.textContent = `${index + 1} / ${GALLERY_PHOTOS.length}`;
-        gsap.to(counter, { opacity: 1, duration: 0.5 });
+function increaseWarpSpeed() {
+    gsap.to({v:warpSpeed},{v:10,duration:0.4,ease:'power2.out',onUpdate:function(){warpSpeed=this.targets()[0].v;}});
+    setTimeout(()=>gsap.to({v:warpSpeed},{v:1,duration:1,ease:'power2.in',onUpdate:function(){warpSpeed=this.targets()[0].v;}}),400);
+}
 
-        // Update caption
-        const caption = document.getElementById('photoCaption');
-        caption.textContent = photo.caption;
+// ═══════════════════════════════════════════════════════
+//  SAMPLE PHOTOS — half resolution + JPEG compression
+// ═══════════════════════════════════════════════════════
+const SAMPLE_COLS = [['#1E90FF','#87CEEB'],['#4169E1','#ADD8E6'],['#00BFFF','#E0F6FF'],['#4682B4','#B0E0E6'],['#5F9EA0','#AFEEEE'],['#6495ED','#F0F8FF']];
+const PHRASES     = ['✈️ DREAM BIG','🛫 FLY HIGH','☁️ TOUCH THE SKY','🌟 REACH FOR STARS','🛬 WINGS OF HOPE','⭐ PILOT IN MAKING'];
+const samplePhotos = [];
 
-        // Update dots
-        updateDot(index);
+function createSampleImage(i) {
+    const c = document.createElement('canvas');
+    c.width=960; c.height=540; // 960×540 vs original 1920×1080 — same look, 4× fewer pixels
+    const ctx=c.getContext('2d');
+    const g=ctx.createLinearGradient(0,0,960,540);
+    g.addColorStop(0,SAMPLE_COLS[i][0]); g.addColorStop(1,SAMPLE_COLS[i][1]);
+    ctx.fillStyle=g; ctx.fillRect(0,0,960,540);
+    ctx.fillStyle='rgba(255,255,255,0.18)';
+    for(let j=0;j<25;j++){ctx.beginPath();ctx.arc(Math.random()*960,Math.random()*540,Math.random()*55+20,0,Math.PI*2);ctx.fill();}
+    ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.font='bold 64px Rajdhani,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(PHRASES[i],480,255);
+    ctx.font='36px Rajdhani,sans-serif'; ctx.fillStyle='rgba(255,215,0,0.9)';
+    ctx.fillText(`Flight Path ${i+1}`,480,320);
+    return c.toDataURL('image/jpeg',0.82); // JPEG saves ~70% vs PNG
+}
+for(let i=0;i<6;i++) samplePhotos.push(createSampleImage(i));
 
-        // Create photo element
-        const photoEl = document.createElement('div');
-        photoEl.className = 'gallery-photo';
+// ═══════════════════════════════════════════════════════
+//  DOM REFS
+// ═══════════════════════════════════════════════════════
+const startScreen        = document.getElementById('startScreen');
+const startButton        = document.getElementById('startButton');
+const cinematicContainer = document.getElementById('cinematicContainer');
+const finalMessage       = document.getElementById('finalMessage');
+const flashOverlay       = document.getElementById('flashOverlay');
+const confettiCanvas     = document.getElementById('confettiCanvas');
+const backgroundMusic    = document.getElementById('backgroundMusic');
+const introVoice         = document.getElementById('introVoice');
+const birthdayText       = document.querySelector('.birthday-text .typed-text');
+const shlokaContainer    = document.getElementById('shlokaContainer');
+const birthdayMessage    = document.getElementById('birthdayMessage');
+let sequenceStarted = false;
 
-        // Responsive sizing
-        const isMobile = window.innerWidth < 768;
-        const pw = isMobile ? Math.min(window.innerWidth * 0.92, 420) : Math.min(window.innerWidth * 0.72, 900);
-        const ph = isMobile ? Math.min(window.innerHeight * 0.65, 520) : Math.min(window.innerHeight * 0.78, 680);
-        photoEl.style.width = pw + 'px';
-        photoEl.style.height = ph + 'px';
-
+// ═══════════════════════════════════════════════════════
+//  PHOTO SLIDES
+// ═══════════════════════════════════════════════════════
+function createPhotoSlides() {
+    samplePhotos.forEach((src, i) => {
+        const slide = document.createElement('div');
+        slide.className='photo-slide'; slide.id=`photo-${i}`;
         const img = document.createElement('img');
-        img.alt = photo.caption;
+        img.src=src; img.alt=`Memory ${i+1}`;
+        slide.appendChild(img); cinematicContainer.appendChild(slide);
+    });
+}
 
-        // Try to load real image; fall back to generated placeholder
-        img.onerror = () => { img.src = generatePlaceholderImage(index, photo.caption); };
-        img.src = photo.src;
+function fadeInMusic(audio, vol=0.7, dur=3) {
+    audio.volume=0; audio.play().catch(()=>{});
+    gsap.to(audio,{volume:vol,duration:dur,ease:'power2.out'});
+}
 
-        photoEl.appendChild(img);
-        gallery.appendChild(photoEl);
+// ═══════════════════════════════════════════════════════
+//  START BUTTON
+// ═══════════════════════════════════════════════════════
+startButton.addEventListener('click', () => {
+    if (sequenceStarted) return;
+    sequenceStarted = true;
+    gsap.to(startButton,{scale:0.9,duration:0.1,onComplete:()=>gsap.to(startButton,{scale:1,duration:0.2})});
+    init3DSpace(); initStars(); animateStars();
+    introVoice?.play().catch(()=>{});
+    if (backgroundMusic) { backgroundMusic.currentTime=0; fadeInMusic(backgroundMusic,0.7,4); }
+    gsap.to(startScreen,{opacity:0,duration:1,ease:'power2.inOut',onComplete:()=>startScreen.style.display='none'});
+    gsap.to(cinematicContainer,{opacity:1,duration:CONFIG.containerFadeInDuration,ease:'power2.inOut',delay:0.5,
+        onComplete:()=>setTimeout(startCinematicSequence,300)});
+});
 
-        // Entrance animation — each photo gets a unique style
-        const entranceStyles = [
-            // Fly in from bottom
-            () => { gsap.set(photoEl, { y: '120vh', opacity:0, rotationY: 0, scale:0.8 });
-                    gsap.to(photoEl, { y:0, opacity:1, scale:1, duration:1.2, ease:'power3.out' }); },
-            // Fly in from left
-            () => { gsap.set(photoEl, { x: '-120vw', opacity:0, rotationY:25, scale:0.85 });
-                    gsap.to(photoEl, { x:0, opacity:1, rotationY:0, scale:1, duration:1.1, ease:'power3.out' }); },
-            // Fly in from right
-            () => { gsap.set(photoEl, { x: '120vw', opacity:0, rotationY:-25, scale:0.85 });
-                    gsap.to(photoEl, { x:0, opacity:1, rotationY:0, scale:1, duration:1.1, ease:'power3.out' }); },
-            // Zoom in from deep space
-            () => { gsap.set(photoEl, { scale:0.05, opacity:0, z:-3000 });
-                    gsap.to(photoEl, { scale:1, opacity:1, z:0, duration:1.3, ease:'power2.out' }); },
-            // Spin in
-            () => { gsap.set(photoEl, { scale:0.1, opacity:0, rotation:180 });
-                    gsap.to(photoEl, { scale:1, opacity:1, rotation:0, duration:1.2, ease:'back.out(1.4)' }); },
-            // Flip in
-            () => { gsap.set(photoEl, { rotationY:90, opacity:0, scale:0.9 });
-                    gsap.to(photoEl, { rotationY:0, opacity:1, scale:1, duration:1.0, ease:'power2.out' }); },
-            // Drop from top
-            () => { gsap.set(photoEl, { y:'-110vh', opacity:0, scale:0.9 });
-                    gsap.to(photoEl, { y:0, opacity:1, scale:1, duration:1.1, ease:'bounce.out' }); },
-            // Diagonal slide
-            () => { gsap.set(photoEl, { x:'-80vw', y:'-80vh', opacity:0, scale:0.7 });
-                    gsap.to(photoEl, { x:0, y:0, opacity:1, scale:1, duration:1.1, ease:'power3.out' }); },
-            // Elastic pop
-            () => { gsap.set(photoEl, { scale:0, opacity:0 });
-                    gsap.to(photoEl, { scale:1, opacity:1, duration:1.2, ease:'elastic.out(1,0.6)' }); },
-            // Warp appear
-            () => { gsap.set(photoEl, { scaleX:0.01, scaleY:2, opacity:0 });
-                    gsap.to(photoEl, { scaleX:1, scaleY:1, opacity:1, duration:0.9, ease:'power3.out' }); },
-        ];
+// ═══════════════════════════════════════════════════════
+//  CINEMATIC SEQUENCE
+// ═══════════════════════════════════════════════════════
+function startCinematicSequence() { animatePhoto(0); }
 
-        const enterFn = entranceStyles[index % entranceStyles.length];
-        enterFn();
+function animatePhoto(index) {
+    if (index >= samplePhotos.length) { showShiva(); setTimeout(showFinalMessage,5000); return; }
+    const slide = document.getElementById(`photo-${index}`);
+    const img   = slide.querySelector('img');
+    const t     = CONFIG.photoTimings[index] || CONFIG.photoTimings[0];
+    increaseWarpSpeed();
+    if (t.flash)    { createFlashEffect(); createCameraShake(); }
+    if (t.beatPunch)  createBeatPunch();
+    const tl = gsap.timeline({onComplete:()=>animatePhoto(index+1)});
+    slide.classList.add('active');
+    gsap.set(slide,{opacity:0,zIndex:10+index,rotateY:t.rotateY*2,rotateX:10,scale:0.3,z:-2000});
+    gsap.set(img,{scale:1,x:0,y:0,rotation:0});
+    tl.to(slide,{opacity:1,rotateY:t.rotateY,rotateX:0,scale:1,z:t.translateZ,duration:CONFIG.fadeInDuration,ease:'power3.out'})
+      .to(slide,{rotateY:t.rotateY*0.5,rotateX:t.rotate*0.3,z:t.translateZ*1.2,duration:t.duration*0.5,ease:'power1.inOut'},'<0.2')
+      .to(img,{scale:t.zoom,x:t.moveX,y:t.moveY,rotation:t.rotate,duration:t.duration,ease:'power1.inOut'},'<')
+      .to(slide,{opacity:0,rotateY:-t.rotateY*2,rotateX:-15,scale:1.5,z:2000,duration:CONFIG.fadeOutDuration,ease:'power2.in',
+          onComplete:()=>slide.classList.remove('active')},`-=${CONFIG.fadeOutDuration}`);
+}
 
-        // Show caption with delay
-        gsap.to(caption, { opacity: 1, y: 0, duration: 0.8, delay: 0.6, ease: 'power2.out' });
+function createFlashEffect() {
+    gsap.timeline()
+        .to(flashOverlay,{opacity:0.9,duration:CONFIG.flashDuration,ease:'power3.out'})
+        .to(flashOverlay,{opacity:0,duration:CONFIG.flashDuration*1.5,ease:'power3.in'});
+}
+function createBeatPunch() {
+    gsap.timeline()
+        .to(cinematicContainer,{scale:CONFIG.beatPunchScale,duration:CONFIG.beatPunchDuration,ease:'power2.out'})
+        .to(cinematicContainer,{scale:1,duration:CONFIG.beatPunchDuration*2,ease:'elastic.out(1,0.3)'});
+}
+function createCameraShake() {
+    gsap.timeline()
+        .to(cinematicContainer,{x:4,duration:0.05}).to(cinematicContainer,{x:-4,duration:0.05})
+        .to(cinematicContainer,{x:3,duration:0.05}).to(cinematicContainer,{x:-3,duration:0.05})
+        .to(cinematicContainer,{x:0,duration:0.05});
+}
 
-        // Ken-Burns subtle pan inside the photo
-        gsap.to(img, {
-            scale: 1.06,
-            x: (Math.random()-0.5)*20,
-            y: (Math.random()-0.5)*10,
-            duration: 5,
-            ease: 'sine.inOut'
+// ═══════════════════════════════════════════════════════
+//  MOTIVATIONAL QUOTES
+// ═══════════════════════════════════════════════════════
+const MOTIVATIONAL_QUOTES = [
+    {text:'The only way to do great work is to love what you do.',author:'— Steve Jobs'},
+    {text:'Believe you can and you\'re halfway there.',author:'— Theodore Roosevelt'},
+    {text:'Success is not final, failure is not fatal: the courage to continue counts.',author:'— Winston Churchill'},
+    {text:'The future belongs to those who believe in the beauty of their dreams.',author:'— Eleanor Roosevelt'},
+    {text:'You are never too old to set another goal or to dream a new dream.',author:'— C.S. Lewis'},
+    {text:'May Lord Shiva\'s divine energy guide you to achieve greatness.',author:'— Divine Blessing'}
+];
+let qIdx=0;
+
+function showMotivationalQuote() {
+    const qc=document.getElementById('motivationalQuote');
+    const qt=document.getElementById('quoteText');
+    const qa=document.getElementById('quoteAuthor');
+    const q=MOTIVATIONAL_QUOTES[qIdx%MOTIVATIONAL_QUOTES.length];
+    qt.textContent=''; qa.textContent='';
+    gsap.to(qc,{opacity:1,duration:1,ease:'power2.out'});
+    let i=0;
+    const typeQ=()=>{if(i<q.text.length){qt.textContent=q.text.slice(0,++i);setTimeout(typeQ,45);}
+        else setTimeout(()=>{gsap.to(qa,{opacity:1,duration:0.8});qa.textContent=q.author;},300);};
+    typeQ();
+    setTimeout(()=>{
+        gsap.to(qc,{opacity:0,y:-20,duration:0.8,ease:'power2.in',onComplete:()=>{
+            qIdx++;
+            if(qIdx<MOTIVATIONAL_QUOTES.length*2) setTimeout(showMotivationalQuote,500);
+        }});
+    },5000);
+}
+
+// ═══════════════════════════════════════════════════════
+//  SHIVA
+// ═══════════════════════════════════════════════════════
+function showShiva() {
+    const sc=document.getElementById('shivaContainer');
+    const si=document.getElementById('shivaImage');
+    const sb=document.getElementById('shivaBlessing');
+    const img=new Image();
+    img.onload=()=>{si.src=img.src;go();};
+    img.onerror=()=>go();
+    img.src='natraja.jpg';
+    function go() {
+        gsap.set(sc,{opacity:0,scale:0.3,rotation:15,y:'100vh'});
+        const tl=gsap.timeline({onComplete:()=>setTimeout(showMotivationalQuote,2000)});
+        tl.to(sc,{opacity:1,duration:1,ease:'power2.out'})
+          .to(sc,{scale:1,rotation:0,y:0,duration:3,ease:'power2.out'},'<')
+          .to(sc,{y:-20,duration:2.5,ease:'sine.inOut',repeat:-1,yoyo:true},'+=0.5')
+          .to(si,{rotation:2,duration:5,ease:'sine.inOut',repeat:-1,yoyo:true,transformOrigin:'center'},'<');
+        setTimeout(()=>gsap.to(sb,{opacity:1,duration:1.5,ease:'back.out(1.2)'}),2000);
+        setTimeout(createFlashEffect,3000);
+        setTimeout(shivaParticles,2500);
+    }
+}
+
+function shivaParticles() {
+    const r=document.getElementById('shivaContainer').getBoundingClientRect();
+    const cx=r.left+r.width/2, cy=r.top+r.height/2;
+    // PERF: 20 particles only (was 50)
+    for(let i=0;i<20;i++) setTimeout(()=>{
+        const p=document.createElement('div');
+        p.style.cssText=`position:fixed;width:6px;height:6px;border-radius:50%;
+            background:${['#FFD700','#FFA500','#87CEEB','#FFFFFF'][i%4]};
+            left:${cx}px;top:${cy}px;pointer-events:none;z-index:410;`;
+        document.body.appendChild(p);
+        const a=(Math.PI*2*i)/20, d=Math.random()*220+120;
+        gsap.to(p,{x:Math.cos(a)*d,y:Math.sin(a)*d,opacity:0,scale:0,duration:1.8,ease:'power2.out',onComplete:()=>p.remove()});
+    }, i*60);
+}
+
+// ═══════════════════════════════════════════════════════
+//  FINAL MESSAGE
+// ═══════════════════════════════════════════════════════
+function showFinalMessage() {
+    gsap.to(finalMessage,{opacity:1,duration:2,ease:'power2.inOut'});
+    finalMessage.classList.add('visible');
+
+    const fullText='Happy Birthday Brother Mere Bhai Shivam Bharti✈️';
+    let ci=0;
+    const typeChar=()=>{
+        if(ci<fullText.length){birthdayText.textContent=fullText.slice(0,++ci);setTimeout(typeChar,100);}
+        else setTimeout(()=>{document.querySelector('.birthday-text .cursor').style.display='none';showShlokas();},500);
+    };
+    setTimeout(typeChar,1000);
+    gsap.fromTo(finalMessage,{scale:0.85},{scale:1,duration:3,ease:'power2.out'});
+    // PERF: Pause THREE.js renderer — saves significant GPU
+    setTimeout(()=>{ _3dPaused=true; },800);
+    setTimeout(()=>{ confettiCanvas.classList.add('visible'); startConfetti(); },3000);
+    setTimeout(startPostBirthdaySequence, 22000);
+}
+
+function showShlokas() {
+    setTimeout(()=>{
+        const s1=document.getElementById('shloka1'), t1=document.getElementById('shloka1Trans');
+        typewriterEff(SHLOKAS[0].text,s1,150,()=>{gsap.to(t1,{opacity:1,duration:1});t1.textContent=SHLOKAS[0].translation;});
+        gsap.to(shlokaContainer,{opacity:1,duration:1});
+    },500);
+    setTimeout(()=>{
+        const s2=document.getElementById('shloka2'), t2=document.getElementById('shloka2Trans');
+        typewriterEff(SHLOKAS[1].text,s2,120,()=>{gsap.to(t2,{opacity:1,duration:1});t2.textContent=SHLOKAS[1].translation;});
+    },4000);
+    setTimeout(()=>{
+        let mi=0;
+        const next=()=>{ if(mi<BIRTHDAY_MESSAGES.length){
+            birthdayMessage.textContent=BIRTHDAY_MESSAGES[mi];
+            gsap.to(birthdayMessage,{opacity:1,duration:1,onComplete:()=>
+                setTimeout(()=>gsap.to(birthdayMessage,{opacity:0,duration:0.5,onComplete:()=>{mi++;next();}}),3000)});
+        }};
+        next();
+    },8000);
+}
+
+function typewriterEff(text,el,speed,cb){
+    let i=0; el.style.opacity='1';
+    const t=()=>{if(i<text.length){el.textContent=text.slice(0,++i);setTimeout(t,speed);}else if(cb)cb();};
+    t();
+}
+
+// ═══════════════════════════════════════════════════════
+//  CONFETTI — optimised: clearRect instead of fillRect, auto-stop
+// ═══════════════════════════════════════════════════════
+function startConfetti() {
+    const cv=confettiCanvas, ctx=cv.getContext('2d');
+    cv.width=innerWidth; cv.height=innerHeight;
+    const COLS=['#1E90FF','#4169E1','#87CEEB','#FFD700','#FFA500','#FFFFFF','#FF4500'];
+    const P=Array.from({length:CONFETTI_N},()=>({
+        x:Math.random()*cv.width, y:Math.random()*cv.height-cv.height,
+        w:Math.random()*11+5, h:Math.random()*11+5,
+        c:COLS[Math.random()*COLS.length|0],
+        vy:Math.random()*4+2, vx:Math.random()*3-1.5,
+        rot:Math.random()*360, rs:Math.random()*10-5, op:Math.random()*0.5+0.5
+    }));
+    let stop=false;
+    // PERF: stop confetti after 22s automatically
+    setTimeout(()=>{stop=true;},22000);
+    const draw=()=>{
+        if(stop){ctx.clearRect(0,0,cv.width,cv.height);return;}
+        ctx.clearRect(0,0,cv.width,cv.height); // clearRect is faster than fillRect for sparse content
+        P.forEach(p=>{
+            p.y+=p.vy; p.x+=p.vx; p.rot+=p.rs; p.vy+=0.04;
+            if(p.y>cv.height+10){p.y=-10;p.x=Math.random()*cv.width;p.vy=Math.random()*4+2;}
+            ctx.save(); ctx.globalAlpha=p.op; ctx.translate(p.x,p.y);
+            ctx.rotate(p.rot*Math.PI/180); ctx.fillStyle=p.c;
+            ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
         });
+        requestAnimationFrame(draw);
+    };
+    draw();
+}
 
-        // Auto-advance after 5 seconds
-        setTimeout(() => {
-            // Exit animation
-            gsap.to(photoEl, {
-                opacity: 0,
-                scale: 0.85,
-                y: '-30px',
-                duration: 0.7,
-                ease: 'power2.in',
-                onComplete: () => {
-                    photoEl.remove();
-                    gsap.to(caption, { opacity: 0, duration: 0.3 });
-                    showGalleryPhoto(index + 1);
-                }
-            });
-        }, 5000);
-    }
+// ═══════════════════════════════════════════════════════
+//  RESIZE
+// ═══════════════════════════════════════════════════════
+window.addEventListener('resize',()=>{
+    starsCanvas.width=innerWidth; starsCanvas.height=innerHeight;
+    if(renderer && camera){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);}
+});
 
-    // ── PLACEHOLDER GENERATOR (if real photos not found) ──────────────
-    function generatePlaceholderImage(index, caption) {
-        const c = document.createElement('canvas');
-        c.width = 900; c.height = 680;
-        const ctx = c.getContext('2d');
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+    createPhotoSlides();
+    gsap.to(startButton,{scale:1.05,duration:1.2,repeat:-1,yoyo:true,ease:'sine.inOut'});
+});
 
-        const palettes = [
-            ['#0D1B2A','#1E90FF','#87CEEB'],
-            ['#1a0533','#8B00FF','#DA70D6'],
-            ['#001a00','#006400','#00FF7F'],
-            ['#1a0a00','#8B4500','#FFD700'],
-            ['#000d1a','#006080','#00FFCC'],
-            ['#1a001a','#800080','#FF69B4'],
-            ['#0a0020','#4B0082','#9370DB'],
-            ['#001a1a','#005050','#00CED1'],
-            ['#1a0000','#8B0000','#FF6347'],
-            ['#0a0a00','#555500','#FFD700'],
-        ];
-        const pal = palettes[index % palettes.length];
 
-        // Background
-        const grad = ctx.createRadialGradient(450, 340, 0, 450, 340, 500);
-        grad.addColorStop(0, pal[1]);
-        grad.addColorStop(0.6, pal[0]);
-        grad.addColorStop(1, '#000000');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, c.width, c.height);
+// ═══════════════════════════════════════════════════════
+//  POST-BIRTHDAY GALAXY PHOTO SEQUENCE
+// ═══════════════════════════════════════════════════════
+const GALLERY_PHOTOS = [
+    {src:'images/photo1.jpeg',  caption:'🌟 A Star Is Born'},
+    {src:'images/photo2.jpeg',  caption:'✈️ Born to Fly'},
+    {src:'images/photo3.jpeg',  caption:'💫 Chasing Dreams'},
+    {src:'images/photo4.jpeg',  caption:'🚀 Sky Is Not The Limit'},
+    {src:'images/photo5.jpeg',  caption:'🎯 Always Focused'},
+    {src:'images/photo6.jpeg',  caption:'🔥 Pure Fire'},
+    {src:'images/photo7.jpeg',  caption:'🌙 Moonwalker'},
+    {src:'images/photo8.jpeg',  caption:'🏆 Born Champion'},
+    {src:'images/photo9.jpeg',  caption:'🎂 Blessed Soul'},
+    {src:'images/photo10.jpeg', caption:'❤️ Mere Bhai'},
+];
 
-        // Stars
-        for (let i = 0; i < 80; i++) {
-            ctx.beginPath();
-            ctx.arc(Math.random()*900, Math.random()*680, Math.random()*1.8+0.3, 0, Math.PI*2);
-            ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.8+0.2})`;
-            ctx.fill();
+let postStars=[], postAnimId=null, postCanvas=null, postCtx=null;
+// Pre-built background ImageData — drawn once, blitted every frame
+let _bgCache=null;
+
+function startPostBirthdaySequence() {
+    const bl=document.getElementById('postBlackout');
+    gsap.to(bl,{opacity:1,duration:2,ease:'power2.inOut',onComplete:()=>{
+        gsap.to(backgroundMusic,{volume:0,duration:1.5,onComplete:()=>{try{backgroundMusic.pause();}catch(e){}}});
+        const pm=document.getElementById('postMusic');
+        pm.volume=0; pm.currentTime=0; pm.play().catch(()=>{});
+        gsap.to(pm,{volume:0.75,duration:3,ease:'power2.out'});
+        setTimeout(initPostGalaxy,900);
+    }});
+}
+
+function initPostGalaxy() {
+    postCanvas=document.getElementById('postGalaxyCanvas');
+    postCtx=postCanvas.getContext('2d');
+
+    // PERF FIX 7: render at 1× DPR, CSS stretches it — massive fillRect saving
+    postCanvas.width  = Math.round(innerWidth);
+    postCanvas.height = Math.round(innerHeight);
+    postCanvas.style.width  = innerWidth+'px';
+    postCanvas.style.height = innerHeight+'px';
+
+    const w=postCanvas.width, h=postCanvas.height;
+
+    // Build static background once
+    const offscreen=document.createElement('canvas');
+    offscreen.width=w; offscreen.height=h;
+    const oc=offscreen.getContext('2d');
+
+    const bg=oc.createRadialGradient(w/2,h/2,0,w/2,h/2,w*0.9);
+    bg.addColorStop(0,'rgba(12,0,45,1)'); bg.addColorStop(0.5,'rgba(5,0,22,1)'); bg.addColorStop(1,'rgba(0,0,5,1)');
+    oc.fillStyle=bg; oc.fillRect(0,0,w,h);
+
+    [{x:.2,y:.3,r:.28,c:'rgba(80,0,180,'},{x:.8,y:.7,r:.22,c:'rgba(0,60,180,'},{x:.5,y:.5,r:.18,c:'rgba(120,0,80,'}].forEach(n=>{
+        const ng=oc.createRadialGradient(n.x*w,n.y*h,0,n.x*w,n.y*h,n.r*w);
+        ng.addColorStop(0,n.c+'0.09)'); ng.addColorStop(1,n.c+'0)');
+        oc.fillStyle=ng; oc.fillRect(0,0,w,h);
+    });
+    const mw=oc.createLinearGradient(0,h*.35,w,h*.65);
+    mw.addColorStop(0,'rgba(100,80,180,0)'); mw.addColorStop(.5,'rgba(130,100,240,0.09)'); mw.addColorStop(1,'rgba(100,80,180,0)');
+    oc.fillStyle=mw; oc.fillRect(0,0,w,h);
+
+    _bgCache=offscreen;
+
+    // Sparse star set
+    const SCOLS=['rgba(255,255,255,','rgba(135,206,235,','rgba(255,215,0,','rgba(180,130,255,'];
+    postStars=Array.from({length:POST_STARS},()=>({
+        x:Math.random()*w, y:Math.random()*h,
+        r:Math.random()*2+0.3,
+        op:Math.random()*0.65+0.2,
+        ts:Math.random()*0.025+0.006,
+        tp:Math.random()*Math.PI*2,
+        c:SCOLS[Math.random()*SCOLS.length|0]
+    }));
+
+    gsap.to(postCanvas,{opacity:1,duration:2.5,ease:'power2.out'});
+    gsap.to(document.getElementById('postBlackout'),{opacity:0,duration:2.5,ease:'power2.out',onComplete:()=>{
+        document.getElementById('postBlackout').style.pointerEvents='none';
+    }});
+
+    animatePostGalaxy(0);
+    setTimeout(()=>{buildDots();showGalleryPhoto(0);},2600);
+}
+
+// PERF FIX 8: throttle galaxy to 30fps, blit cached background
+let _lastGF=0;
+function animatePostGalaxy(ts) {
+    postAnimId=requestAnimationFrame(animatePostGalaxy);
+    if(ts-_lastGF < 34) return; // ~30fps
+    _lastGF=ts;
+
+    const w=postCanvas.width, h=postCanvas.height;
+    // Blit the static background
+    postCtx.drawImage(_bgCache,0,0,w,h);
+
+    // Draw twinkling stars on top
+    const now=Date.now()*.001;
+    postStars.forEach(s=>{
+        const twk=0.5+0.5*Math.sin(now*s.ts*60+s.tp);
+        const a=s.op*(0.4+0.6*twk);
+        postCtx.beginPath();
+        postCtx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        postCtx.fillStyle=s.c+a+')';
+        postCtx.fill();
+        if(s.r>1.6 && a>0.65){
+            postCtx.strokeStyle=s.c+(a*0.35)+')';
+            postCtx.lineWidth=0.5;
+            postCtx.beginPath();
+            postCtx.moveTo(s.x-s.r*3,s.y); postCtx.lineTo(s.x+s.r*3,s.y);
+            postCtx.moveTo(s.x,s.y-s.r*3); postCtx.lineTo(s.x,s.y+s.r*3);
+            postCtx.stroke();
         }
+    });
+}
 
-        // Centre glow
-        const cg = ctx.createRadialGradient(450, 300, 0, 450, 300, 200);
-        cg.addColorStop(0, pal[2] + '55');
-        cg.addColorStop(1, 'transparent');
-        ctx.fillStyle = cg;
-        ctx.fillRect(0, 0, c.width, c.height);
+function buildDots() {
+    const el=document.getElementById('photoDots');
+    el.innerHTML='';
+    GALLERY_PHOTOS.forEach((_,i)=>{const d=document.createElement('div');d.className='photo-dot';d.id=`dot-${i}`;el.appendChild(d);});
+    gsap.to(el,{opacity:1,duration:1});
+}
+function setDot(i){document.querySelectorAll('.photo-dot').forEach((d,j)=>d.classList.toggle('active',j===i));}
 
-        // Photo number
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.font = 'bold 90px Rajdhani, sans-serif';
-        ctx.fillStyle = 'rgba(255,255,255,0.15)';
-        ctx.fillText(`${index+1}`, 450, 280);
+function showGalleryPhoto(index) {
+    if(index>=GALLERY_PHOTOS.length){setTimeout(showEndCard,1200);return;}
+    const photo=GALLERY_PHOTOS[index];
+    const gallery=document.getElementById('photoGallery');
+    gsap.to(gallery,{opacity:1,duration:0.5});
 
-        // Caption
-        ctx.font = 'bold 44px Rajdhani, sans-serif';
-        ctx.fillStyle = '#FFFFFF';
-        ctx.shadowColor = pal[1];
-        ctx.shadowBlur = 20;
-        ctx.fillText(caption, 450, 340);
+    const counter=document.getElementById('photoCounter');
+    counter.textContent=`${index+1} / ${GALLERY_PHOTOS.length}`;
+    gsap.to(counter,{opacity:1,duration:0.5});
 
-        // Sub-label
-        ctx.font = '26px Rajdhani, sans-serif';
-        ctx.fillStyle = pal[2];
-        ctx.shadowBlur = 10;
-        ctx.fillText('Shivam Bharti', 450, 400);
+    const caption=document.getElementById('photoCaption');
+    caption.textContent=photo.caption;
+    setDot(index);
 
-        // Gold border
-        ctx.strokeStyle = '#FFD700';
-        ctx.lineWidth = 5;
-        ctx.shadowColor = '#FFD700';
-        ctx.shadowBlur = 25;
-        ctx.strokeRect(12, 12, c.width-24, c.height-24);
+    const photoEl=document.createElement('div');
+    photoEl.className='gallery-photo';
+    const pw=isMobile?Math.min(innerWidth*.92,420):Math.min(innerWidth*.72,900);
+    const ph=isMobile?Math.min(innerHeight*.65,520):Math.min(innerHeight*.78,680);
+    photoEl.style.width=pw+'px'; photoEl.style.height=ph+'px';
 
-        return c.toDataURL();
-    }
+    const img=document.createElement('img');
+    img.alt=photo.caption;
+    img.onerror=()=>{img.onerror=null; img.src=makePlaceholder(index,photo.caption);};
+    img.src=photo.src;
+    photoEl.appendChild(img); gallery.appendChild(photoEl);
 
-    // ── STEP 6: END CARD ──────────────────────────────────────────────
-    function showEndCard() {
-        // Hide gallery UI
-        gsap.to(['#photoGallery','#photoCaption','#photoCounter','#photoDots'], { opacity:0, duration:1 });
+    // Entrance styles — 10 unique animations
+    const enters=[
+        ()=>{gsap.set(photoEl,{y:'110vh',opacity:0,scale:.85});gsap.to(photoEl,{y:0,opacity:1,scale:1,duration:1.1,ease:'power3.out'});},
+        ()=>{gsap.set(photoEl,{x:'-110vw',opacity:0});gsap.to(photoEl,{x:0,opacity:1,duration:1.0,ease:'power3.out'});},
+        ()=>{gsap.set(photoEl,{x:'110vw',opacity:0});gsap.to(photoEl,{x:0,opacity:1,duration:1.0,ease:'power3.out'});},
+        ()=>{gsap.set(photoEl,{scale:.05,opacity:0});gsap.to(photoEl,{scale:1,opacity:1,duration:1.2,ease:'power2.out'});},
+        ()=>{gsap.set(photoEl,{scale:.1,opacity:0,rotation:180});gsap.to(photoEl,{scale:1,opacity:1,rotation:0,duration:1.1,ease:'back.out(1.3)'});},
+        ()=>{gsap.set(photoEl,{rotationY:85,opacity:0});gsap.to(photoEl,{rotationY:0,opacity:1,duration:1.0,ease:'power2.out'});},
+        ()=>{gsap.set(photoEl,{y:'-110vh',opacity:0,scale:.9});gsap.to(photoEl,{y:0,opacity:1,scale:1,duration:1.1,ease:'bounce.out'});},
+        ()=>{gsap.set(photoEl,{x:'-70vw',y:'-70vh',opacity:0,scale:.7});gsap.to(photoEl,{x:0,y:0,opacity:1,scale:1,duration:1.0,ease:'power3.out'});},
+        ()=>{gsap.set(photoEl,{scale:0,opacity:0});gsap.to(photoEl,{scale:1,opacity:1,duration:1.1,ease:'elastic.out(1,.6)'});},
+        ()=>{gsap.set(photoEl,{scaleX:.02,opacity:0});gsap.to(photoEl,{scaleX:1,opacity:1,duration:.8,ease:'power3.out'});},
+    ];
+    enters[index%enters.length]();
 
-        const endCard = document.getElementById('endCard');
-        gsap.to(endCard, { opacity:1, duration:2, ease:'power2.inOut', pointerEvents:'auto' });
+    gsap.to(caption,{opacity:1,duration:.8,delay:.5,ease:'power2.out'});
 
-        // Animate end title letters one by one
-        gsap.from('.end-title', { y: 60, opacity:0, duration:1.5, ease:'back.out(1.7)', delay:0.5 });
-        gsap.from('.end-subtitle', { y: 40, opacity:0, duration:1.2, ease:'power2.out', delay:1.2 });
-        gsap.from('.end-translation', { y: 30, opacity:0, duration:1.0, ease:'power2.out', delay:1.8 });
+    // Ken-Burns — subtle
+    gsap.to(img,{scale:1.04,x:(Math.random()-.5)*10,y:(Math.random()-.5)*8,duration:5,ease:'sine.inOut'});
 
-        // Particle burst at end
-        for (let i = 0; i < 80; i++) {
-            setTimeout(() => {
-                const p = document.createElement('div');
-                p.style.cssText = `position:fixed;border-radius:50%;pointer-events:none;z-index:2040;`;
-                const size = Math.random()*8+3;
-                p.style.width = size+'px'; p.style.height = size+'px';
-                p.style.background = ['#FFD700','#FFA500','#87CEEB','#FFFFFF','#FF69B4','#DA70D6'][Math.floor(Math.random()*6)];
-                p.style.left = (30 + Math.random()*40) + 'vw';
-                p.style.top = '50vh';
-                p.style.boxShadow = `0 0 ${size*2}px currentColor`;
-                document.body.appendChild(p);
-                gsap.to(p, {
-                    x: (Math.random()-0.5)*window.innerWidth*0.8,
-                    y: (Math.random()-1.2)*window.innerHeight*0.8,
-                    opacity: 0, scale: 0, duration: 2.5+Math.random()*2,
-                    ease: 'power2.out', onComplete: ()=>p.remove()
-                });
-            }, i * 40);
-        }
-    }
+    setTimeout(()=>{
+        gsap.to(photoEl,{opacity:0,scale:.88,y:'-18px',duration:.65,ease:'power2.in',onComplete:()=>{
+            photoEl.remove();
+            gsap.to(caption,{opacity:0,duration:.25});
+            showGalleryPhoto(index+1);
+        }});
+    },5000);
+}
 
-    </script>
+function makePlaceholder(idx,cap) {
+    const c=document.createElement('canvas'); c.width=800; c.height=600;
+    const ctx=c.getContext('2d');
+    const pals=[['#0D1B2A','#1E90FF','#87CEEB'],['#1a0533','#8B00FF','#DA70D6'],['#001a00','#006400','#00FF7F'],
+                 ['#1a0a00','#8B4500','#FFD700'],['#000d1a','#006080','#00FFCC'],['#1a001a','#800080','#FF69B4'],
+                 ['#0a0020','#4B0082','#9370DB'],['#001a1a','#005050','#00CED1'],['#1a0000','#8B0000','#FF6347'],
+                 ['#0a0a00','#555500','#FFD700']];
+    const pal=pals[idx%pals.length];
+    const g=ctx.createRadialGradient(400,300,0,400,300,450);
+    g.addColorStop(0,pal[1]); g.addColorStop(.6,pal[0]); g.addColorStop(1,'#000');
+    ctx.fillStyle=g; ctx.fillRect(0,0,800,600);
+    for(let i=0;i<50;i++){ctx.beginPath();ctx.arc(Math.random()*800,Math.random()*600,Math.random()*1.5+.2,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${Math.random()*.7+.2})`;ctx.fill();}
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font='bold 48px Rajdhani,sans-serif'; ctx.fillStyle='#FFF'; ctx.shadowColor=pal[1]; ctx.shadowBlur=20;
+    ctx.fillText(cap,400,285);
+    ctx.font='28px Rajdhani,sans-serif'; ctx.fillStyle=pal[2]; ctx.shadowBlur=10;
+    ctx.fillText('Shivam Bharti',400,350);
+    ctx.strokeStyle='#FFD700'; ctx.lineWidth=4; ctx.shadowColor='#FFD700'; ctx.shadowBlur=18;
+    ctx.strokeRect(10,10,780,580);
+    return c.toDataURL('image/jpeg',.8);
+}
+
+function showEndCard() {
+    gsap.to(['#photoGallery','#photoCaption','#photoCounter','#photoDots'],{opacity:0,duration:.8});
+    const ec=document.getElementById('endCard');
+    gsap.to(ec,{opacity:1,duration:2,ease:'power2.inOut',pointerEvents:'auto'});
+    gsap.from('.end-title',{y:60,opacity:0,duration:1.5,ease:'back.out(1.7)',delay:.5});
+    gsap.from('.end-subtitle',{y:40,opacity:0,duration:1.2,ease:'power2.out',delay:1.2});
+    gsap.from('.end-translation',{y:30,opacity:0,duration:1.0,ease:'power2.out',delay:1.8});
+    // Stop galaxy loop
+    if(postAnimId){cancelAnimationFrame(postAnimId);postAnimId=null;}
+    // 30 burst particles only
+    for(let i=0;i<30;i++) setTimeout(()=>{
+        const p=document.createElement('div');
+        const sz=Math.random()*7+3;
+        p.style.cssText=`position:fixed;border-radius:50%;pointer-events:none;z-index:2040;
+            width:${sz}px;height:${sz}px;
+            background:${['#FFD700','#FFA500','#87CEEB','#FFFFFF','#FF69B4'][i%5]};
+            left:${35+Math.random()*30}vw;top:50vh;`;
+        document.body.appendChild(p);
+        gsap.to(p,{x:(Math.random()-.5)*innerWidth*.7,y:(Math.random()-1.3)*innerHeight*.7,
+            opacity:0,scale:0,duration:2+Math.random()*1.5,ease:'power2.out',onComplete:()=>p.remove()});
+    },i*55);
+}
+</script>
 </body>
 </html>
